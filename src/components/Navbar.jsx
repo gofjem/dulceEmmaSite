@@ -32,7 +32,7 @@ export default function Navbar() {
         {/* Logo */}
         <a href="#inicio" className="flex items-center group">
           <img
-            src="/logo.png"
+            src="/logo.jpg"
             alt="Dulce Emma"
             className="h-12 w-12 rounded-full object-cover shadow-md group-hover:scale-105 transition-transform duration-300"
           />
