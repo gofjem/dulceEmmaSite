@@ -107,7 +107,7 @@ export default function Pedidos() {
     setError('')
   }
 
-  const minFecha = new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+  const minFecha = new Date().toISOString().split('T')[0]
 
   return (
     <section id="pedidos" className="py-20 md:py-28 bg-chocolate relative overflow-hidden">
@@ -121,7 +121,7 @@ export default function Pedidos() {
           <h2 className="font-playfair text-3xl md:text-4xl text-crema font-bold">Haz tu pedido</h2>
           <div className="w-16 h-0.5 bg-dorado mx-auto my-4" />
           <p className="font-montserrat text-crema/60 text-sm">
-            Con 48 horas de anticipación. Te confirmaremos disponibilidad por WhatsApp.
+            Te confirmaremos disponibilidad por WhatsApp.
           </p>
         </div>
 
