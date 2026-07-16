@@ -1,6 +1,4 @@
 export const METODOS_PAGO = [
-  { value: 'webpay', label: 'Transbank WebPay (tarjeta crédito/débito)' },
-  { value: 'mercadopago', label: 'MercadoPago' },
   { value: 'transferencia', label: 'Transferencia bancaria' },
   { value: 'efectivo', label: 'Efectivo al retirar' },
 ]
