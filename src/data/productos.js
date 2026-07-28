@@ -88,7 +88,7 @@ export const productos = [
     descripcion: 'Galleta estilo New York con un cremoso corazón de pie de limón y un delicado toque cítrico',
     precio: 3500,
     stock: 15,
-    imagen: '/images/Galle_Pie_limon.jpg',
+    imagen: '/images/Galle_PieLimon.png',
     tag: 'Especial',
     categoria: 'Cookie',
   }
