@@ -38,7 +38,7 @@ export const productos = [
     descripcion: 'Bizcocho esponjoso, crema chantilly artesanal y fresas frescas de temporada.',
     precio: 3000,
     stock: 6,
-    imagen: '/images/Torta_Red_Velvet.jpg',
+    imagen: '/images/Torta_RedVelvet.png',
     tag: 'Para celebrar',
     categoria: 'Torta',
   },
