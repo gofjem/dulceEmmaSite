@@ -86,7 +86,7 @@ export const productos = [
     id: 8,
     nombre: 'Galletas New York Pie de Limón',
     descripcion: 'Galleta estilo New York con un cremoso corazón de pie de limón y un delicado toque cítrico',
-    precio: 3500,
+    precio: 3700,
     stock: 15,
     imagen: '/images/Galle_PieLimon.png',
     tag: 'Especial',
