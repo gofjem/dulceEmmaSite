@@ -68,13 +68,25 @@ export default function Nosotras() {
 
             <div className="space-y-4 font-montserrat text-cafe/80 text-base leading-relaxed">
               <p>
-                Todo comenzó en una pequeña cocina de casa, con una abuela que decía que los mejores postres no se miden en gramos, sino en cuánto amor les pones.
+                <strong className="text-chocolate">Dulce Emma</strong> nació de un sueño muy especial: el sueño de una niña.
               </p>
               <p>
-                <strong className="text-chocolate">Emma</strong> creció viendo esas manos trabajar la harina, el chocolate y la mantequilla con una paciencia infinita. Con el tiempo, aprendió que cada postre es una historia: una celebración, un consuelo, un "te quiero" sin palabras.
+                Todo comenzó cuando Emma tenía apenas cinco años. En su guardería participaron en una actividad de educación financiera donde cada niño debía crear una idea de negocio para desarrollar junto a sus padres. Sin dudarlo, Emma eligió hacer galletas.
+              </p>
+              <p>
+                Ese día, junto a su mamá, preparó sus primeras galletas con mucha ilusión. Al finalizar la actividad, las vendieron en la entrada de la guardería a las familias que iban llegando. Para sorpresa de todos, lograron vender toda su producción. Más que unas simples galletas, aquel momento sembró una semilla que cambiaría nuestra historia.
+              </p>
+              <p>
+                Desde entonces <strong className="text-chocolate">Emma</strong> no dejó de soñar con tener su propio emprendimiento. Con el apoyo de su familia, comenzó a preparar nuevos postres en casa junto a su mamá, descubriendo en cada receta una nueva oportunidad para aprender, crear y compartir momentos felices.
+              </p>
+              <p>
+                Lo que empezó como una tarea escolar se convirtió en una verdadera pasión. Emma descubrió el amor por la repostería, siguiendo los pasos de su mamá, quien también encontró en cada preparación una forma de expresar cariño y dedicación. Juntas comenzaron a perfeccionar recetas, experimentar nuevos sabores y cuidar cada detalle con paciencia y amor.
+              </p>
+              <p>
+                Así nació <strong className="text-chocolate">Dulce Emma</strong>un emprendimiento familiar inspirado en la ilusión de una niña, construido con dedicación, trabajo y el deseo de endulzar la vida de quienes prueban nuestros productos.
               </p>
               <p className="italic text-cafe/70">
-                "Dulce Emma nació del deseo de compartir esas historias con el mundo, una porción a la vez."
+                "Hoy, cada galleta y cada postre que sale de nuestra cocina conserva la misma esencia de aquel primer día: la emoción de crear algo hecho con amor, compartirlo con los demás y demostrar que los sueños más grandes pueden comenzar con un pequeño gesto."
               </p>
             </div>
 
