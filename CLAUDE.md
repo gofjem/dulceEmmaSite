@@ -80,6 +80,20 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | Quesillo Premium de Caramelo | `public/images/Quesillo_Art.png` |
 | Sección Nosotras | `public/images/Nosotras.jpeg` |
 
+**Catálogo actual (precios en CLP):**
+
+| # | Producto | Precio | Categoría | Tag |
+|---|---|---|---|---|
+| 1 | Torta 3 Leches | $3.500 | Torta | Favorito |
+| 2 | Marquesa de Chocolate | $3.500 | Brownie | Clásico |
+| 3 | Torta Red Velvet | $3.000 | Torta | Para celebrar |
+| 4 | Galletas New York Cookies and Cream | $3.500 | Cookie | Para regalo |
+| 5 | Galletas New York Triple Chocolate | $3.500 | Cookie | Premium |
+| 6 | Galletas New York Red Velvet | $3.500 | Cookie | Especial |
+| 7 | Galletas New York Choco Chips Nuez | $3.500 | Cookie | Especial |
+| 8 | Galletas New York Pie de Limón | $3.700 | Cookie | Especial |
+| 9 | Quesillo Premium de Caramelo | $2.700 | Postres Artesanales | Especial |
+
 ## Production
 
 - **URL:** https://dulce-emma.vercel.app
