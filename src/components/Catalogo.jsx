@@ -1,6 +1,6 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ShoppingBag, Star } from 'lucide-react'
-import { productos } from '../data/productos'
+import { getProductos } from '../services/api'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
@@ -72,6 +72,11 @@ function ProductCard({ producto, index }) {
 
 export default function Catalogo() {
   const titleRef = useRef(null)
+  const [productos, setProductos] = useState([])
+
+  useEffect(() => {
+    getProductos().then(setProductos).catch(console.error)
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

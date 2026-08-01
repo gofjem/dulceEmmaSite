@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle } from 'lucide-react'
-import { productos, METODOS_PAGO } from '../data/productos'
-import { crearPedido } from '../services/api'
+import { METODOS_PAGO } from '../data/productos'
+import { crearPedido, getProductos } from '../services/api'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
@@ -26,11 +26,16 @@ function SectionHeader({ icon: Icon, title }) {
 }
 
 export default function Pedidos() {
+  const [productos, setProductos] = useState([])
   const [form, setForm] = useState(estadoInicial)
   const [resultado, setResultado] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const sectionRef = useRef(null)
+
+  useEffect(() => {
+    getProductos().then(setProductos).catch(console.error)
+  }, [])
 
   useEffect(() => {
     const observer = new IntersectionObserver(

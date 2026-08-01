@@ -1,13 +1,15 @@
-import { productos as catalogoData } from '../data/productos'
-
 // ── PRODUCTOS ─────────────────────────────────────────────────────────────────
 
 export async function getProductos() {
-  return catalogoData
+  const res = await fetch('/api/productos')
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al obtener productos')
+  return data.productos
 }
 
 export async function getProductoById(id) {
-  return catalogoData.find((p) => p.id === id) ?? null
+  const lista = await getProductos()
+  return lista.find((p) => p.id === id) ?? null
 }
 
 // ── PEDIDOS ───────────────────────────────────────────────────────────────────
