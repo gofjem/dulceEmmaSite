@@ -65,7 +65,7 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 2. Copiar a `public/images/` con el nombre exacto que espera `productos.js`.
 3. Hacer commit de `public/images/archivo.png` junto con el cambio en `productos.js`.
 
-**Estado actual — todas las imágenes son locales (`.png`):**
+**Estado actual — todas las imágenes son locales:**
 
 | Producto | Archivo |
 |---|---|
@@ -77,6 +77,8 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | Galletas Red Velvet | `public/images/Galle_Red_velvet.jpg` |
 | Galletas Choco Chips Nuez | `public/images/Galle_Choco_chips_nuez.jpg` |
 | Galletas Pie de Limón | `public/images/Galle_PieLimon.png` |
+| Quesillo Premium de Caramelo | `public/images/Quesillo_Art.png` |
+| Sección Nosotras | `public/images/Nosotras.jpeg` |
 
 ## Production
 
