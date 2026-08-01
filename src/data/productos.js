@@ -91,5 +91,15 @@ export const productos = [
     imagen: '/images/Galle_PieLimon.png',
     tag: 'Especial',
     categoria: 'Cookie',
+  },
+  {
+    id: 9,
+    nombre: 'Quesillo Premium de Caramelo',
+    descripcion: 'Delicado postre de textura suave y cremosa, elaborado con ingredientes seleccionados y bañado en un intenso caramelo artesanal que se funde en cada bocado',
+    precio: 2700,
+    stock: 15,
+    imagen: '/images/Quesillo_Art.png',
+    tag: 'Especial',
+    categoria: 'Postres Artesanales',
   }
 ]
