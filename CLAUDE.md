@@ -26,10 +26,14 @@ Single-page app with a flat component stack. No router — `App.jsx` checks `win
 ```
 Browser → Vite (5173)
               └─ /api/* → Express server.js (3001)
-                              └─ api/pedidos/index.js   POST/GET
-                              └─ api/pedidos/[id].js    GET/PUT/DELETE
+                              └─ api/productos/index.js  GET(?all) / POST
+                              └─ api/productos/[id].js   PUT
+                              └─ api/pedidos/index.js    POST/GET
+                              └─ api/pedidos/[id].js     GET/PUT/DELETE
                                       └─ api/_lib/supabase.js (service_role key)
-                                              └─ Supabase PostgreSQL (tabla: pedidos)
+                                              └─ Supabase PostgreSQL
+                                                      └─ tabla: productos
+                                                      └─ tabla: pedidos
 ```
 
 The same `api/` handlers run both locally (via `server.js`) and in production (Vercel Serverless Functions). They are framework-agnostic `(req, res)` handlers.
@@ -50,20 +54,22 @@ VITE_ADMIN_PASSWORD=...              # exposed to client via Vite
 
 ## Key conventions
 
-- **Productos** are static data in `src/data/productos.js` — not stored in DB.
+- **Productos** are stored in Supabase (`tabla: productos`). The public site fetches `GET /api/productos` (only `activo=true`). The admin fetches `GET /api/productos?all=true`. `src/data/productos.js` only holds `METODOS_PAGO` and `ESTADOS_PEDIDO` constants now.
 - **Pedidos** are stored in Supabase. `cancelarPedido` does a `PUT estado='Cancelado'`, never a hard delete.
-- **Admin auth** is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD` in `Admin.jsx` — no JWT/session.
+- **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has two tabs: **Pedidos** (gestión de estados) and **Productos** (CRUD completo: crear, editar, activar/desactivar).
+- Desactivar un producto (`activo=false`) lo oculta del catálogo público sin borrarlo de la BD.
 - Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements.
 - Tailwind color names (`chocolate`, `cafe`, `dorado`, `crema`, `rosa`) are custom-defined in `tailwind.config.js`.
 
 ## Imágenes de productos
 
-Las imágenes locales van en `public/images/` y se referencian como `/images/nombre.png` en `src/data/productos.js`. Vite las sirve estáticamente desde `public/`.
+Las imágenes locales van en `public/images/` y se referencian como `/images/nombre.png`. Vite las sirve estáticamente desde `public/`.
 
 **Flujo para agregar una imagen nueva:**
 1. El usuario pone el archivo en `images/` (raíz del proyecto, carpeta no commiteada).
-2. Copiar a `public/images/` con el nombre exacto que espera `productos.js`.
-3. Hacer commit de `public/images/archivo.png` junto con el cambio en `productos.js`.
+2. Copiar a `public/images/` con el nombre exacto.
+3. Hacer commit de `public/images/archivo.png`.
+4. Entrar al panel admin → Productos → Editar el producto y escribir la ruta `/images/nombre.png` en el campo Imagen.
 
 **Estado actual — todas las imágenes son locales:**
 
@@ -80,7 +86,7 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | Quesillo Premium de Caramelo | `public/images/Quesillo_Art.png` |
 | Sección Nosotras | `public/images/Nosotras.jpeg` |
 
-**Catálogo actual (precios en CLP):**
+**Catálogo actual (precios en CLP) — gestionado desde el panel admin `/admin` → Productos:**
 
 | # | Producto | Precio | Categoría | Tag |
 |---|---|---|---|---|
@@ -93,6 +99,8 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | 7 | Galletas New York Choco Chips Nuez | $3.500 | Cookie | Especial |
 | 8 | Galletas New York Pie de Limón | $3.700 | Cookie | Especial |
 | 9 | Quesillo Premium de Caramelo | $2.700 | Postres Artesanales | Especial |
+
+> Para cambiar precios, agregar o desactivar productos: usar el panel admin, no editar código.
 
 ## Production
 
