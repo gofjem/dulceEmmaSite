@@ -1,7 +1,7 @@
 // ── PRODUCTOS ─────────────────────────────────────────────────────────────────
 
-export async function getProductos() {
-  const res = await fetch('/api/productos')
+export async function getProductos(all = false) {
+  const res = await fetch(all ? '/api/productos?all=true' : '/api/productos')
   const data = await res.json()
   if (!res.ok) throw new Error(data.error ?? 'Error al obtener productos')
   return data.productos
@@ -10,6 +10,28 @@ export async function getProductos() {
 export async function getProductoById(id) {
   const lista = await getProductos()
   return lista.find((p) => p.id === id) ?? null
+}
+
+export async function crearProducto(producto) {
+  const res = await fetch('/api/productos', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(producto),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al crear producto')
+  return data.producto
+}
+
+export async function actualizarProducto(id, updates) {
+  const res = await fetch(`/api/productos/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al actualizar producto')
+  return data.producto
 }
 
 // ── PEDIDOS ───────────────────────────────────────────────────────────────────
