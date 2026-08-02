@@ -4,6 +4,12 @@ import { getProductos } from '../services/api'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
+const DISP_STYLES = {
+  'Disponible':  'bg-green-100 text-green-700',
+  'Agotado':     'bg-red-100 text-red-700',
+  'Por encargo': 'bg-amber-100 text-amber-800',
+}
+
 function ProductCard({ producto, index }) {
   const ref = useRef(null)
 
@@ -54,6 +60,10 @@ function ProductCard({ producto, index }) {
         <p className="font-montserrat text-cafe/80 text-sm leading-relaxed mb-4">
           {producto.descripcion}
         </p>
+
+        <span className={`inline-block text-xs font-montserrat font-semibold px-2.5 py-0.5 rounded-full mb-3 ${DISP_STYLES[producto.disponibilidad] ?? DISP_STYLES['Disponible']}`}>
+          {producto.disponibilidad ?? 'Disponible'}
+        </span>
 
         <div className="flex items-center justify-between">
           <span className="font-playfair text-2xl text-cafe font-bold">{formatPrecio(producto.precio)}</span>

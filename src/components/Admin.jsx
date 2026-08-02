@@ -14,9 +14,17 @@ const ESTADO_COLORS = {
   'Cancelado':      'bg-red-100 text-red-700',
 }
 
+const DISPONIBILIDADES = ['Disponible', 'Agotado', 'Por encargo']
+
+const DISP_COLORS = {
+  'Disponible':  'bg-green-100 text-green-700',
+  'Agotado':     'bg-red-100 text-red-700',
+  'Por encargo': 'bg-amber-100 text-amber-700',
+}
+
 const FORM_VACIO = {
   nombre: '', descripcion: '', precio: '', stock: '0',
-  imagen: '', tag: '', categoria: '',
+  imagen: '', tag: '', categoria: '', disponibilidad: 'Disponible',
 }
 
 function Login({ onLogin }) {
@@ -154,6 +162,12 @@ function ProductosPanel() {
             <label className="block text-xs text-gray-500 mb-1">Tag</label>
             <input name="tag" value={form.tag} onChange={onChange} placeholder="Favorito, Especial, Premium…" className={input} />
           </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Disponibilidad</label>
+            <select name="disponibilidad" value={form.disponibilidad ?? 'Disponible'} onChange={onChange} className={input}>
+              {DISPONIBILIDADES.map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
           <div className="sm:col-span-2">
             <label className="block text-xs text-gray-500 mb-1">Imagen (ruta)</label>
             <input name="imagen" value={form.imagen} onChange={onChange} placeholder="/images/nombre.png" className={input} />
@@ -180,7 +194,7 @@ function ProductosPanel() {
           <table className="w-full text-sm">
             <thead style={{ background: '#2D1C15', color: '#F7F1E8' }}>
               <tr>
-                {['Nombre', 'Precio', 'Categoría', 'Tag', 'Stock', 'Activo', 'Acciones'].map(h => (
+                {['Nombre', 'Precio', 'Categoría', 'Tag', 'Disponibilidad', 'Stock', 'Activo', 'Acciones'].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
                 ))}
               </tr>
@@ -195,6 +209,11 @@ function ProductosPanel() {
                   <td className="px-4 py-3 whitespace-nowrap">${p.precio?.toLocaleString('es-CL')}</td>
                   <td className="px-4 py-3 text-gray-600">{p.categoria}</td>
                   <td className="px-4 py-3 text-gray-600">{p.tag}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${DISP_COLORS[p.disponibilidad] ?? DISP_COLORS['Disponible']}`}>
+                      {p.disponibilidad ?? 'Disponible'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3">{p.stock}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
