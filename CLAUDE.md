@@ -107,6 +107,7 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 - **URL:** https://dulce-emma.vercel.app
 - **DNS:** Cloudflare (nameservers: `jerry.ns.cloudflare.com`, `saanvi.ns.cloudflare.com`) → A record `76.76.21.21` (Vercel)
 - **Domain:** dulceemma.cl — activo y funcionando (nameservers cambiados en Hostinger el 2026-07-10)
+- **Deploy:** automático — cada `git push origin master` despliega a producción (GitHub repo conectado a Vercel el 2026-08-01)
 - **Pending:** Flow.cl (WebPay Chile) payment integration via `/api/pagos`
 
 ## Flow.cl integration (pendiente de implementar)
