@@ -56,6 +56,7 @@ VITE_ADMIN_PASSWORD=...              # exposed to client via Vite
 
 - **Productos** are stored in Supabase (`tabla: productos`). The public site fetches `GET /api/productos` (only `activo=true`). The admin fetches `GET /api/productos?all=true`. `src/data/productos.js` only holds `METODOS_PAGO` and `ESTADOS_PEDIDO` constants now.
 - **Pedidos** are stored in Supabase. `cancelarPedido` does a `PUT estado='Cancelado'`, never a hard delete.
+- El formulario público de `Pedidos.jsx` soporta múltiples líneas de producto por pedido (array `form.lineas`, botones "Agregar otro producto" / quitar). El payload enviado sigue siendo `productos: [...]`, formato que el backend (`api/pedidos/index.js`) y el panel admin ya soportaban desde antes. Agregado 2026-08-14.
 - **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has two tabs: **Pedidos** (gestión de estados) and **Productos** (CRUD completo: crear, editar, activar/desactivar).
 - Desactivar un producto (`activo=false`) lo oculta del catálogo público sin borrarlo de la BD.
 - Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements.
