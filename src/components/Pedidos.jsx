@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle } from 'lucide-react'
+import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { METODOS_PAGO } from '../data/productos'
 import { crearPedido, getProductos } from '../services/api'
 
@@ -8,10 +8,12 @@ const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 const inputClass =
   'w-full bg-white border border-dorado/30 rounded-xl px-4 py-3 font-montserrat text-chocolate placeholder-cafe/40 text-sm focus:outline-none focus:ring-2 focus:ring-dorado/50 focus:border-dorado transition-all'
 
+const lineaInicial = { productoId: '', cantidad: '1' }
+
 const estadoInicial = {
   nombre: '', apellido: '', telefono: '', correo: '',
   calle: '', numero: '', comuna: '', ciudad: '', referencias: '',
-  productoId: '', cantidad: '1', fecha: '',
+  lineas: [{ ...lineaInicial }], fecha: '',
   metodoPago: '',
   mensaje: '',
 }
@@ -48,8 +50,18 @@ export default function Pedidos() {
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
-  const productoSel = productos.find((p) => p.id === Number(form.productoId))
-  const total = productoSel ? productoSel.precio * Number(form.cantidad) : 0
+  const onLineaChange = (i, campo, valor) => {
+    const lineas = form.lineas.map((l, idx) => idx === i ? { ...l, [campo]: valor } : l)
+    setForm({ ...form, lineas })
+  }
+  const addLinea = () => setForm({ ...form, lineas: [...form.lineas, { ...lineaInicial }] })
+  const removeLinea = (i) => setForm({ ...form, lineas: form.lineas.filter((_, idx) => idx !== i) })
+
+  const lineasConProducto = form.lineas.map((l) => ({
+    ...l,
+    producto: productos.find((p) => p.id === Number(l.productoId)),
+  }))
+  const total = lineasConProducto.reduce((sum, l) => sum + (l.producto ? l.producto.precio * Number(l.cantidad) : 0), 0)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -70,12 +82,12 @@ export default function Pedidos() {
           ciudad: form.ciudad,
           referencias: form.referencias,
         },
-        productos: [{
-          productoId: Number(form.productoId),
-          nombre: productoSel?.nombre ?? '',
-          cantidad: Number(form.cantidad),
-          precioUnitario: productoSel?.precio ?? 0,
-        }],
+        productos: lineasConProducto.map((l) => ({
+          productoId: Number(l.productoId),
+          nombre: l.producto?.nombre ?? '',
+          cantidad: Number(l.cantidad),
+          precioUnitario: l.producto?.precio ?? 0,
+        })),
         total,
         fechaEntrega: form.fecha,
         metodoPago: form.metodoPago,
@@ -90,7 +102,7 @@ export default function Pedidos() {
           `🎂 *Pedido Dulce Emma*`,
           `📋 N° ${resp.numeroPedido}`,
           `👤 ${form.nombre} ${form.apellido} | ${form.telefono}`,
-          `📦 ${productoSel?.nombre} x${form.cantidad} — ${formatPrecio(total)}`,
+          ...lineasConProducto.map((l) => `📦 ${l.producto?.nombre} x${l.cantidad} — ${formatPrecio((l.producto?.precio ?? 0) * Number(l.cantidad))}`),
           `📅 Entrega: ${form.fecha}`,
           `💳 Pago: ${form.metodoPago}`,
           `📍 ${form.calle} ${form.numero}, ${form.comuna}, ${form.ciudad}`,
@@ -204,23 +216,38 @@ export default function Pedidos() {
               {/* ── Tu pedido ── */}
               <div>
                 <SectionHeader icon={ShoppingBag} title="Tu pedido" />
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                  <div className="sm:col-span-2">
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Producto *</label>
-                    <select name="productoId" value={form.productoId} onChange={onChange} required className={inputClass}>
-                      <option value="">Seleccionar...</option>
-                      {productos.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.nombre} — {formatPrecio(p.precio)}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Cantidad *</label>
-                    <input type="number" name="cantidad" value={form.cantidad} onChange={onChange} min="1" max="100" required className={inputClass} />
-                  </div>
+                <div className="space-y-3">
+                  {form.lineas.map((linea, i) => (
+                    <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+                      <div className="sm:col-span-2">
+                        {i === 0 && <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Producto *</label>}
+                        <select value={linea.productoId} onChange={(e) => onLineaChange(i, 'productoId', e.target.value)} required className={inputClass}>
+                          <option value="">Seleccionar...</option>
+                          {productos.map((p) => (
+                            <option key={p.id} value={p.id}>
+                              {p.nombre} — {formatPrecio(p.precio)}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="flex-1">
+                          {i === 0 && <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Cantidad *</label>}
+                          <input type="number" value={linea.cantidad} onChange={(e) => onLineaChange(i, 'cantidad', e.target.value)} min="1" max="100" required className={inputClass} />
+                        </div>
+                        {form.lineas.length > 1 && (
+                          <button type="button" onClick={() => removeLinea(i)} className="shrink-0 text-rosa/80 hover:text-rosa p-3" aria-label="Quitar producto">
+                            <Trash2 size={18} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
+
+                <button type="button" onClick={addLinea} className="mt-3 flex items-center gap-1.5 font-montserrat text-dorado text-sm hover:text-crema transition-colors">
+                  <Plus size={16} /> Agregar otro producto
+                </button>
 
                 {total > 0 && (
                   <div className="mt-3 text-right">
