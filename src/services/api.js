@@ -79,6 +79,37 @@ export async function cancelarPedido(id) {
   return data
 }
 
+// ── PROMOCIONES ───────────────────────────────────────────────────────────────
+
+export async function getPromociones(all = false) {
+  const res = await fetch(all ? '/api/promociones?all=true' : '/api/promociones')
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al obtener promociones')
+  return data.promociones
+}
+
+export async function crearPromocion(promo) {
+  const res = await fetch('/api/promociones', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(promo),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al crear promoción')
+  return data.promocion
+}
+
+export async function actualizarPromocion(id, updates) {
+  const res = await fetch(`/api/promociones/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(updates),
+  })
+  const data = await res.json()
+  if (!res.ok) throw new Error(data.error ?? 'Error al actualizar promoción')
+  return data.promocion
+}
+
 // ── PAGOS ─────────────────────────────────────────────────────────────────────
 // TODO: implementar con Flow.cl
 

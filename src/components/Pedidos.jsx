@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { METODOS_PAGO } from '../data/productos'
-import { crearPedido, getProductos } from '../services/api'
+import { crearPedido, getProductos, getPromociones } from '../services/api'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
@@ -29,6 +29,7 @@ function SectionHeader({ icon: Icon, title }) {
 
 export default function Pedidos() {
   const [productos, setProductos] = useState([])
+  const [promociones, setPromociones] = useState([])
   const [form, setForm] = useState(estadoInicial)
   const [resultado, setResultado] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -37,6 +38,7 @@ export default function Pedidos() {
 
   useEffect(() => {
     getProductos().then(setProductos).catch(console.error)
+    getPromociones().then(setPromociones).catch(console.error)
   }, [])
 
   useEffect(() => {
@@ -59,9 +61,11 @@ export default function Pedidos() {
 
   const lineasConProducto = form.lineas.map((l) => ({
     ...l,
-    producto: productos.find((p) => p.id === Number(l.productoId)),
+    item: String(l.productoId).startsWith('pr-')
+      ? promociones.find((p) => p.id === Number(String(l.productoId).slice(3)))
+      : productos.find((p) => p.id === Number(l.productoId)),
   }))
-  const total = lineasConProducto.reduce((sum, l) => sum + (l.producto ? l.producto.precio * Number(l.cantidad) : 0), 0)
+  const total = lineasConProducto.reduce((sum, l) => sum + (l.item ? l.item.precio * Number(l.cantidad) : 0), 0)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -83,10 +87,10 @@ export default function Pedidos() {
           referencias: form.referencias,
         },
         productos: lineasConProducto.map((l) => ({
-          productoId: Number(l.productoId),
-          nombre: l.producto?.nombre ?? '',
+          productoId: !String(l.productoId).startsWith('pr-') ? Number(l.productoId) : null,
+          nombre: l.item?.nombre ?? '',
           cantidad: Number(l.cantidad),
-          precioUnitario: l.producto?.precio ?? 0,
+          precioUnitario: l.item?.precio ?? 0,
         })),
         total,
         fechaEntrega: form.fecha,
@@ -102,7 +106,7 @@ export default function Pedidos() {
           `🎂 *Pedido Dulce Emma*`,
           `📋 N° ${resp.numeroPedido}`,
           `👤 ${form.nombre} ${form.apellido} | ${form.telefono}`,
-          ...lineasConProducto.map((l) => `📦 ${l.producto?.nombre} x${l.cantidad} — ${formatPrecio((l.producto?.precio ?? 0) * Number(l.cantidad))}`),
+          ...lineasConProducto.map((l) => `📦 ${l.item?.nombre} x${l.cantidad} — ${formatPrecio((l.item?.precio ?? 0) * Number(l.cantidad))}`),
           `📅 Entrega: ${form.fecha}`,
           `💳 Pago: ${form.metodoPago}`,
           `📍 ${form.calle} ${form.numero}, ${form.comuna}, ${form.ciudad}`,
@@ -223,11 +227,20 @@ export default function Pedidos() {
                         {i === 0 && <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Producto *</label>}
                         <select value={linea.productoId} onChange={(e) => onLineaChange(i, 'productoId', e.target.value)} required className={inputClass}>
                           <option value="">Seleccionar...</option>
-                          {productos.map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.nombre} — {formatPrecio(p.precio)}
-                            </option>
-                          ))}
+                          {productos.length > 0 && (
+                            <optgroup label="Productos">
+                              {productos.map((p) => (
+                                <option key={p.id} value={p.id}>{p.nombre} — {formatPrecio(p.precio)}</option>
+                              ))}
+                            </optgroup>
+                          )}
+                          {promociones.length > 0 && (
+                            <optgroup label="🎁 Promociones">
+                              {promociones.map((p) => (
+                                <option key={`pr-${p.id}`} value={`pr-${p.id}`}>{p.nombre} — {formatPrecio(p.precio)}</option>
+                              ))}
+                            </optgroup>
+                          )}
                         </select>
                       </div>
                       <div className="flex gap-2">

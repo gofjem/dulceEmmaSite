@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getPedidos, actualizarPedido, cancelarPedido, getProductos, crearProducto, actualizarProducto } from '../services/api'
+import { getPedidos, actualizarPedido, cancelarPedido, getProductos, crearProducto, actualizarProducto, getPromociones, crearPromocion, actualizarPromocion } from '../services/api'
 
 // ponytail: contraseña en var de entorno del cliente; suficiente para panel interno
 const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD ?? 'dulceemma2024'
@@ -352,6 +352,159 @@ function PedidosPanel() {
   )
 }
 
+// ── PROMOCIONES ──────────────────────────────────────────────────────────────
+
+const FORM_PROMO_VACIO = { nombre: '', descripcion: '', precio: '', imagen: '' }
+
+function PromocionesPanel() {
+  const [promociones, setPromociones] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [form, setForm] = useState(null)
+  const [guardando, setGuardando] = useState(false)
+  const [err, setErr] = useState('')
+
+  async function cargar() {
+    setLoading(true)
+    try { setPromociones(await getPromociones(true)) }
+    catch (e) { setErr(e.message) }
+    finally { setLoading(false) }
+  }
+
+  useEffect(() => { cargar() }, [])
+
+  const onChange = e => setForm({ ...form, [e.target.name]: e.target.value })
+
+  async function guardar(e) {
+    e.preventDefault()
+    setGuardando(true)
+    setErr('')
+    try {
+      const payload = { ...form, precio: Number(form.precio) }
+      if (form.id) {
+        const updated = await actualizarPromocion(form.id, payload)
+        setPromociones(prev => prev.map(p => p.id === form.id ? updated : p))
+      } else {
+        const nueva = await crearPromocion(payload)
+        setPromociones(prev => [nueva, ...prev])
+      }
+      setForm(null)
+    } catch (e) {
+      setErr(e.message)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  async function toggleActivo(p) {
+    const updated = await actualizarPromocion(p.id, { activo: !p.activo })
+    setPromociones(prev => prev.map(x => x.id === p.id ? updated : x))
+  }
+
+  const input = 'w-full border rounded-lg px-3 py-2 text-sm outline-none focus:border-amber-400'
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <span className="text-sm text-gray-500">{promociones.length} promociones</span>
+        <div className="flex gap-2">
+          <button onClick={cargar} className="px-4 py-2 rounded-lg text-sm text-white" style={{ background: '#8B5E3C' }}>
+            Actualizar
+          </button>
+          <button
+            onClick={() => setForm(FORM_PROMO_VACIO)}
+            className="px-4 py-2 rounded-lg text-sm text-white font-semibold"
+            style={{ background: '#2D1C15' }}
+          >
+            + Nueva promoción
+          </button>
+        </div>
+      </div>
+
+      {form && (
+        <form onSubmit={guardar} className="bg-white rounded-2xl shadow p-6 mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <h3 className="sm:col-span-2 font-bold text-base" style={{ color: '#2D1C15' }}>
+            {form.id ? 'Editar promoción' : 'Nueva promoción'}
+          </h3>
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Nombre *</label>
+            <input name="nombre" value={form.nombre} onChange={onChange} required placeholder="Ej. 2x Galletas Choco Chips Nutella" className={input} />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Descripción</label>
+            <textarea name="descripcion" value={form.descripcion} onChange={onChange} rows={2} placeholder="Describe qué incluye el combo" className={`${input} resize-none`} />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Precio (CLP) *</label>
+            <input name="precio" type="number" value={form.precio} onChange={onChange} required min="0" placeholder="6500" className={input} />
+          </div>
+          <div>
+            <label className="block text-xs text-gray-500 mb-1">Imagen (ruta)</label>
+            <input name="imagen" value={form.imagen} onChange={onChange} placeholder="/images/nombre.png" className={input} />
+          </div>
+          {err && <p className="sm:col-span-2 text-red-500 text-xs">{err}</p>}
+          <div className="sm:col-span-2 flex gap-3 justify-end">
+            <button type="button" onClick={() => setForm(null)} className="px-4 py-2 rounded-lg text-sm border hover:bg-gray-50">
+              Cancelar
+            </button>
+            <button type="submit" disabled={guardando} className="px-4 py-2 rounded-lg text-sm text-white font-semibold disabled:opacity-60" style={{ background: '#8B5E3C' }}>
+              {guardando ? 'Guardando…' : 'Guardar'}
+            </button>
+          </div>
+        </form>
+      )}
+
+      {loading && <p className="text-center text-gray-400 py-8">Cargando…</p>}
+
+      {!loading && (
+        <div className="bg-white rounded-2xl shadow overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead style={{ background: '#2D1C15', color: '#F7F1E8' }}>
+              <tr>
+                {['Nombre', 'Descripción', 'Precio', 'Activo', 'Acciones'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left font-medium whitespace-nowrap">{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {promociones.length === 0 && (
+                <tr><td colSpan={5} className="text-center text-gray-400 py-8">Sin promociones</td></tr>
+              )}
+              {promociones.map((p, i) => (
+                <tr key={p.id} className={i % 2 === 0 ? 'bg-white' : 'bg-amber-50'}>
+                  <td className="px-4 py-3 font-medium">{p.nombre}</td>
+                  <td className="px-4 py-3 text-gray-500 text-xs max-w-xs truncate">{p.descripcion ?? '—'}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">${p.precio?.toLocaleString('es-CL')}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.activo ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                      {p.activo ? 'Activa' : 'Inactiva'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => setForm({ ...p, precio: String(p.precio) })}
+                        className="px-3 py-1 rounded-lg text-xs text-white font-medium bg-amber-700 hover:bg-amber-800"
+                      >
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => toggleActivo(p)}
+                        className={`px-3 py-1 rounded-lg text-xs text-white font-medium ${p.activo ? 'bg-red-500 hover:bg-red-600' : 'bg-green-600 hover:bg-green-700'}`}
+                      >
+                        {p.activo ? 'Desactivar' : 'Activar'}
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── ADMIN SHELL ───────────────────────────────────────────────────────────────
 
 export default function Admin() {
@@ -370,7 +523,7 @@ export default function Admin() {
           </h1>
           {/* Tabs */}
           <div className="flex gap-2">
-            {[['pedidos', 'Pedidos'], ['productos', 'Productos']].map(([key, label]) => (
+            {[['pedidos', 'Pedidos'], ['productos', 'Productos'], ['promociones', 'Promociones']].map(([key, label]) => (
               <button
                 key={key}
                 onClick={() => setTab(key)}
@@ -385,8 +538,9 @@ export default function Admin() {
           </div>
         </div>
 
-        {tab === 'pedidos'   && <PedidosPanel />}
-        {tab === 'productos' && <ProductosPanel />}
+        {tab === 'pedidos'      && <PedidosPanel />}
+        {tab === 'productos'    && <ProductosPanel />}
+        {tab === 'promociones'  && <PromocionesPanel />}
       </div>
     </div>
   )

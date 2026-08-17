@@ -4,6 +4,8 @@ import pedidosIndex from './api/pedidos/index.js'
 import pedidosById from './api/pedidos/[id].js'
 import productosIndex from './api/productos/index.js'
 import productosById from './api/productos/[id].js'
+import promocionesIndex from './api/promociones/index.js'
+import promocionesById from './api/promociones/[id].js'
 
 const app = express()
 app.use(express.json())
@@ -26,6 +28,15 @@ app.all('/api/pedidos/:id', (req, res) => {
     configurable: true,
   })
   pedidosById(req, res)
+})
+
+app.all('/api/promociones', promocionesIndex)
+app.all('/api/promociones/:id', (req, res) => {
+  Object.defineProperty(req, 'query', {
+    value: { ...req.query, id: req.params.id },
+    writable: true, configurable: true,
+  })
+  promocionesById(req, res)
 })
 
 app.listen(3001, () => console.log('API corriendo en http://localhost:3001'))

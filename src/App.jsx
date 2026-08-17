@@ -5,6 +5,7 @@ import Hero from './components/Hero'
 import Catalogo from './components/Catalogo'
 import Galeria from './components/Galeria'
 import Nosotras from './components/Nosotras'
+import Promociones from './components/Promociones'
 import Pedidos from './components/Pedidos'
 import Contacto from './components/Contacto'
 import Footer from './components/Footer'
@@ -40,6 +41,7 @@ export default function App() {
         <Catalogo />
         <Galeria />
         <Nosotras />
+        <Promociones />
         <Pedidos />
         <Contacto />
       </main>
