@@ -30,10 +30,13 @@ Browser → Vite (5173)
                               └─ api/productos/[id].js   PUT
                               └─ api/pedidos/index.js    POST/GET
                               └─ api/pedidos/[id].js     GET/PUT/DELETE
+                              └─ api/promociones/index.js  GET / POST
+                              └─ api/promociones/[id].js   PUT
                                       └─ api/_lib/supabase.js (service_role key)
                                               └─ Supabase PostgreSQL
                                                       └─ tabla: productos
                                                       └─ tabla: pedidos
+                                                      └─ tabla: promociones
 ```
 
 The same `api/` handlers run both locally (via `server.js`) and in production (Vercel Serverless Functions). They are framework-agnostic `(req, res)` handlers.
@@ -57,8 +60,9 @@ VITE_ADMIN_PASSWORD=...              # exposed to client via Vite
 - **Productos** are stored in Supabase (`tabla: productos`). The public site fetches `GET /api/productos` (only `activo=true`). The admin fetches `GET /api/productos?all=true`. `src/data/productos.js` only holds `METODOS_PAGO` and `ESTADOS_PEDIDO` constants now.
 - **Pedidos** are stored in Supabase. `cancelarPedido` does a `PUT estado='Cancelado'`, never a hard delete.
 - El formulario público de `Pedidos.jsx` soporta múltiples líneas de producto por pedido (array `form.lineas`, botones "Agregar otro producto" / quitar). El payload enviado sigue siendo `productos: [...]`, formato que el backend (`api/pedidos/index.js`) y el panel admin ya soportaban desde antes. Agregado 2026-08-14.
-- **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has two tabs: **Pedidos** (gestión de estados) and **Productos** (CRUD completo: crear, editar, activar/desactivar).
-- Desactivar un producto (`activo=false`) lo oculta del catálogo público sin borrarlo de la BD.
+- **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has three tabs: **Pedidos** (gestión de estados), **Productos** (CRUD completo), and **Promociones** (CRUD de combos).
+- Desactivar un producto o promoción (`activo=false`) lo oculta del sitio público sin borrarlo de la BD.
+- **Promociones** son combos con precio fijo (ej. "2x Galletas Choco Chips Nutella — $6.500"). Se gestionan desde `/admin` → Promociones. En el formulario de pedido aparecen como `<optgroup label="🎁 Promociones">` dentro del mismo selector. En el payload del pedido se guardan con `productoId: null` en el array `productos` de Supabase. La sección pública `Promociones.jsx` aparece entre Nosotras y Pedidos solo si hay al menos una promo activa.
 - Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements.
 - Tailwind color names (`chocolate`, `cafe`, `dorado`, `crema`, `rosa`) are custom-defined in `tailwind.config.js`.
 
@@ -86,6 +90,26 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | Galletas Pie de Limón | `public/images/Galle_PieLimon.png` |
 | Quesillo Premium de Caramelo | `public/images/Quesillo_Art.png` |
 | Sección Nosotras | `public/images/Nosotras.jpeg` |
+
+## Imágenes de promociones
+
+El flujo es idéntico al de productos. Las imágenes van en `public/images/` y se referencian como `/images/nombre.png`.
+
+**Flujo para agregar imagen a una promo:**
+1. El usuario pone el archivo en `images/` (raíz del proyecto, carpeta no commiteada).
+2. Copiar a `public/images/` con el nombre exacto.
+3. Hacer commit de `public/images/archivo.png`.
+4. Entrar al panel admin → Promociones → Editar la promo y escribir la ruta `/images/nombre.png` en el campo Imagen.
+
+Si no se asigna imagen, la card muestra un ícono placeholder (Tag de lucide-react).
+
+**Catálogo actual de promociones — gestionado desde el panel admin `/admin` → Promociones:**
+
+| # | Promoción | Precio |
+|---|---|---|
+| 1 | 2x Galletas Choco Chips Nutella | $6.500 |
+
+> Para crear, editar o desactivar promociones: usar el panel admin, no editar código.
 
 **Catálogo actual (precios en CLP) — gestionado desde el panel admin `/admin` → Productos:**
 
