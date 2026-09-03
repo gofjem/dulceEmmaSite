@@ -43,21 +43,36 @@ The same `api/` handlers run both locally (via `server.js`) and in production (V
 
 **`server.js` quirk (Express 5):** `req.query` is a non-writable getter in Express 5. The server shadows it with `Object.defineProperty` before calling the `[id].js` handler so `req.query.id` carries the route param.
 
+## Cuentas y accesos
+
+| Servicio | Cuenta / Usuario | Detalle |
+|---|---|---|
+| **GitHub (repo)** | `gofjem` | Repo `gofjem/dulceEmmaSite` — autenticado en git local |
+| **GitHub (Vercel/Supabase)** | `jemagofe` | Cuenta separada — usada para login en Vercel y Supabase vía GitHub OAuth |
+| **Vercel** | `jemagofe` / team `websitedev1` | Email: `cacay.gestion@gmail.com` · Proyecto: `dulce-emma` |
+| **Supabase (producción)** | cuenta `jemagofe` (GitHub OAuth) | Project ID: `jawekeunlviwlhguwkkn` · URL: `https://jawekeunlviwlhguwkkn.supabase.co` |
+| **Cloudflare / Hostinger** | andreinamquintero@gmail.com | DNS y dominio dulceemma.cl |
+
+> **Trampa frecuente:** `gofjem` y `jemagofe` son cuentas GitHub distintas. El repo de GitHub es `gofjem/dulceEmmaSite` pero Vercel y Supabase están bajo `jemagofe`. Por eso el deploy usa GitHub Actions en vez de la integración nativa de Vercel.
+
+> **Proyecto Supabase temporal:** Durante la sesión 2026-09-03 se creó accidentalmente el proyecto `lfgmtgelwlwxtkihxjpw` (en otra cuenta). El `.env` local quedó apuntando a ese proyecto vacío. **Para dev local correcto, el `.env` debe usar `jawekeunlviwlhguwkkn` (producción).**
+
 ## Environment variables
 
 Required in `.env` (local) and Vercel dashboard (production):
 
 ```
-SUPABASE_URL=https://lfgmtgelwlwxtkihxjpw.supabase.co
+SUPABASE_URL=https://jawekeunlviwlhguwkkn.supabase.co   # producción — el correcto
 SUPABASE_SERVICE_KEY=eyJ...   # service_role key — server-side only
-VITE_ADMIN_PASSWORD=...              # exposed to client via Vite
+VITE_ADMIN_PASSWORD=...       # exposed to client via Vite
 ```
 
 `api/_lib/supabase.js` creates a new client per request (no singleton) using the service_role key — this bypasses Supabase RLS intentionally.
 
 ## Key conventions
 
-- **Productos** are stored in Supabase (`tabla: productos`). The public site fetches `GET /api/productos` (only `activo=true`). The admin fetches `GET /api/productos?all=true`. `src/data/productos.js` only holds `METODOS_PAGO` and `ESTADOS_PEDIDO` constants now.
+- **Productos** are stored in Supabase (`tabla: productos`). The public site fetches `GET /api/productos` (only `activo=true`). The admin fetches `GET /api/productos?all=true`. `src/data/productos.js` only holds `ESTADOS_PEDIDO` constants now (`METODOS_PAGO` fue eliminado — solo existe transferencia bancaria).
+- **Variaciones de producto:** columna `variaciones JSONB` en `productos`. Array de `{nombre, precio, imagen?}`. El primer elemento es la opción principal (índice 0). Si un producto tiene variaciones, `Catalogo.jsx` muestra pill buttons y usa el precio/imagen de la variación activa. `Pedidos.jsx` muestra un sub-selector de tamaño. `Admin.jsx` edita el JSON directo en un textarea. Actualmente solo el Quesillo Premium tiene variaciones. Agregado 2026-09-03.
 - **Pedidos** are stored in Supabase. `cancelarPedido` does a `PUT estado='Cancelado'`, never a hard delete.
 - El formulario público de `Pedidos.jsx` soporta múltiples líneas de producto por pedido (array `form.lineas`, botones "Agregar otro producto" / quitar). El payload enviado sigue siendo `productos: [...]`, formato que el backend (`api/pedidos/index.js`) y el panel admin ya soportaban desde antes. Agregado 2026-08-14.
 - **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has three tabs: **Pedidos** (gestión de estados), **Productos** (CRUD completo), and **Promociones** (CRUD de combos).
@@ -78,18 +93,19 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 
 **Estado actual — todas las imágenes son locales:**
 
-| Producto | Archivo |
-|---|---|
-| Torta 3 Leches | `public/images/Torta_3Leches.png` |
-| Marquesa de Chocolate | `public/images/Torta_Marquesa.png` |
-| Torta Red Velvet | `public/images/Torta_RedVelvet.png` |
-| Galletas Cookies and Cream | `public/images/Galle_Cookies_and_cream.jpg` |
-| Galletas Triple Chocolate | `public/images/Galle_3_choco.jpg` |
-| Galletas Red Velvet | `public/images/Galle_Red_velvet.jpg` |
-| Galletas Choco Chips Nuez | `public/images/Galle_Choco_chips_nuez.jpg` |
-| Galletas Pie de Limón | `public/images/Galle_PieLimon.png` |
-| Quesillo Premium de Caramelo | `public/images/Quesillo_Art.png` |
-| Sección Nosotras | `public/images/Nosotras.jpeg` |
+| Producto | Archivo | Nota |
+|---|---|---|
+| Torta 3 Leches | `public/images/Torta_3Leches.png` | |
+| Marquesa de Chocolate | `public/images/Torta_Marquesa.png` | |
+| Torta Red Velvet | `public/images/Torta_RedVelvet.png` | |
+| Galletas Cookies and Cream | `public/images/Galle_Cookies_and_cream.jpg` | |
+| Galletas Triple Chocolate | `public/images/Galle_3_choco.jpg` | |
+| Galletas Red Velvet | `public/images/Galle_Red_velvet.jpg` | |
+| Galletas Choco Chips Nuez | `public/images/Galle_Choco_chips_nuez.jpg` | |
+| Galletas Pie de Limón | `public/images/Galle_PieLimon.png` | |
+| Quesillo Premium — Porción 19 cm | `public/images/Quesillo_19cm.png` | imagen de variación (por defecto) |
+| Quesillo Premium — Porción individual | `public/images/Quesillo_Art.png` | imagen de variación alternativa |
+| Sección Nosotras | `public/images/Nosotras.jpeg` | |
 
 ## Imágenes de promociones
 
@@ -123,7 +139,15 @@ Si no se asigna imagen, la card muestra un ícono placeholder (Tag de lucide-rea
 | 6 | Galletas New York Red Velvet | $3.500 | Cookie | Especial |
 | 7 | Galletas New York Choco Chips Nuez | $3.500 | Cookie | Especial |
 | 8 | Galletas New York Pie de Limón | $3.700 | Cookie | Especial |
-| 9 | Quesillo Premium de Caramelo | $2.700 | Postres Artesanales | Especial |
+| 9 | Quesillo Premium de Caramelo | ver variaciones | Postres Artesanales | Especial |
+
+**Variaciones del Quesillo (columna `variaciones` en Supabase):**
+```json
+[
+  {"nombre": "Porción 19 cm", "precio": 12000, "imagen": "/images/Quesillo_19cm.png"},
+  {"nombre": "Porción individual", "precio": 2700}
+]
+```
 
 > Para cambiar precios, agregar o desactivar productos: usar el panel admin, no editar código.
 
@@ -132,7 +156,10 @@ Si no se asigna imagen, la card muestra un ícono placeholder (Tag de lucide-rea
 - **URL:** https://dulce-emma.vercel.app
 - **DNS:** Cloudflare (nameservers: `jerry.ns.cloudflare.com`, `saanvi.ns.cloudflare.com`) → A record `76.76.21.21` (Vercel)
 - **Domain:** dulceemma.cl — activo y funcionando (nameservers cambiados en Hostinger el 2026-07-10)
-- **Deploy:** automático via GitHub Actions (`.github/workflows/deploy.yml`) — cada `git push origin master` corre `npx vercel --prod` con `VERCEL_TOKEN` guardado como secreto en `gofjem/dulceEmmaSite`. Configurado 2026-08-02. El repo de GitHub (`gofjem`) y la cuenta Vercel (`jemagofe/websitedev1`) son cuentas separadas — por eso se usa Actions en vez de la integración nativa de Vercel.
+- **Deploy:** automático via GitHub Actions (`.github/workflows/deploy.yml`) — cada `git push origin master` corre `npx vercel --prod` con `VERCEL_TOKEN` guardado como secreto en `gofjem/dulceEmmaSite`. Configurado 2026-08-02.
+  - `VERCEL_ORG_ID` → `team_m0yDWHN9VfXV8ajFhPzensaS`
+  - `VERCEL_PROJECT_ID` → `prj_cEDOb9twjIIdrHWTRF5vgwLRrpmG`
+  - El repo GitHub (`gofjem`) y la cuenta Vercel (`jemagofe/websitedev1`) son cuentas separadas — por eso se usa Actions en vez de la integración nativa de Vercel.
 - **Pending:** Flow.cl (WebPay Chile) payment integration via `/api/pagos`
 
 ## Flow.cl integration (pendiente de implementar)
