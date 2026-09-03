@@ -24,7 +24,7 @@ const DISP_COLORS = {
 
 const FORM_VACIO = {
   nombre: '', descripcion: '', precio: '', stock: '0',
-  imagen: '', tag: '', categoria: '', disponibilidad: 'Disponible',
+  imagen: '', tag: '', categoria: '', disponibilidad: 'Disponible', variaciones: '',
 }
 
 function Login({ onLogin }) {
@@ -85,10 +85,15 @@ function ProductosPanel() {
     setGuardando(true)
     setErr('')
     try {
+      let variaciones = null
+      if (form.variaciones?.trim()) {
+        try { variaciones = JSON.parse(form.variaciones) } catch { setErr('JSON de variaciones inválido'); setGuardando(false); return }
+      }
       const payload = {
         ...form,
         precio: Number(form.precio),
         stock:  Number(form.stock),
+        variaciones,
       }
       if (form.id) {
         const updated = await actualizarProducto(form.id, payload)
@@ -172,6 +177,17 @@ function ProductosPanel() {
             <label className="block text-xs text-gray-500 mb-1">Imagen (ruta)</label>
             <input name="imagen" value={form.imagen} onChange={onChange} placeholder="/images/nombre.png" className={input} />
           </div>
+          <div className="sm:col-span-2">
+            <label className="block text-xs text-gray-500 mb-1">Variaciones (JSON — dejar vacío si no aplica)</label>
+            <textarea
+              name="variaciones"
+              value={form.variaciones}
+              onChange={onChange}
+              rows={4}
+              placeholder={'[\n  {"nombre": "Porción 19 cm", "precio": 12000, "imagen": "/images/foto.png"},\n  {"nombre": "Porción individual", "precio": 2700}\n]'}
+              className={`${input} resize-none font-mono text-xs`}
+            />
+          </div>
 
           {err && <p className="sm:col-span-2 text-red-500 text-xs">{err}</p>}
 
@@ -222,7 +238,7 @@ function ProductosPanel() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => setForm({ ...p, precio: String(p.precio), stock: String(p.stock) })} className={btn('cafe')}>
+                      <button onClick={() => setForm({ ...p, precio: String(p.precio), stock: String(p.stock), variaciones: p.variaciones ? JSON.stringify(p.variaciones, null, 2) : '' })} className={btn('cafe')}>
                         Editar
                       </button>
                       <button onClick={() => toggleActivo(p)} className={btn(p.activo ? 'red' : 'green')}>

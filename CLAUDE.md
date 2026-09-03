@@ -48,8 +48,8 @@ The same `api/` handlers run both locally (via `server.js`) and in production (V
 Required in `.env` (local) and Vercel dashboard (production):
 
 ```
-SUPABASE_URL=https://jawekeunlviwlhguwkkn.supabase.co
-SUPABASE_SERVICE_KEY=sb_secret_...   # service_role key — server-side only
+SUPABASE_URL=https://lfgmtgelwlwxtkihxjpw.supabase.co
+SUPABASE_SERVICE_KEY=eyJ...   # service_role key — server-side only
 VITE_ADMIN_PASSWORD=...              # exposed to client via Vite
 ```
 

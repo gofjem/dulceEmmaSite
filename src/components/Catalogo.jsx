@@ -12,6 +12,7 @@ const DISP_STYLES = {
 
 function ProductCard({ producto, index }) {
   const ref = useRef(null)
+  const [selectedVar, setSelectedVar] = useState(0)
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -28,12 +29,16 @@ function ProductCard({ producto, index }) {
     return () => observer.disconnect()
   }, [index])
 
+  const vars = producto.variaciones
+  const activeImg = vars?.length > 0 && vars[selectedVar]?.imagen ? vars[selectedVar].imagen : producto.imagen
+  const activePrecio = vars?.length > 0 ? vars[selectedVar].precio : producto.precio
+
   return (
     <div ref={ref} className="reveal card-hover bg-white rounded-2xl overflow-hidden shadow-md group">
       {/* Image */}
       <div className="relative overflow-hidden h-52">
         <img
-          src={producto.imagen}
+          src={activeImg}
           alt={producto.nombre}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
@@ -65,8 +70,27 @@ function ProductCard({ producto, index }) {
           {producto.disponibilidad ?? 'Disponible'}
         </span>
 
+        {vars?.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {vars.map((v, vi) => (
+              <button
+                key={vi}
+                type="button"
+                onClick={() => setSelectedVar(vi)}
+                className={`text-xs font-montserrat px-3 py-1 rounded-full border transition-colors ${
+                  selectedVar === vi
+                    ? 'bg-cafe text-white border-cafe'
+                    : 'bg-white text-cafe border-cafe/30 hover:border-cafe'
+                }`}
+              >
+                {v.nombre}
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center justify-between">
-          <span className="font-playfair text-2xl text-cafe font-bold">{formatPrecio(producto.precio)}</span>
+          <span className="font-playfair text-2xl text-cafe font-bold">{formatPrecio(activePrecio)}</span>
           <a
             href="#pedidos"
             className="flex items-center gap-2 bg-rosa/40 hover:bg-cafe hover:text-crema text-cafe text-sm font-montserrat font-semibold px-4 py-2 rounded-full transition-all duration-300"

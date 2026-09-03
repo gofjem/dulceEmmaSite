@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle, Plus, Trash2 } from 'lucide-react'
-import { METODOS_PAGO } from '../data/productos'
 import { crearPedido, getProductos, getPromociones } from '../services/api'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
@@ -8,13 +7,13 @@ const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 const inputClass =
   'w-full bg-white border border-dorado/30 rounded-xl px-4 py-3 font-montserrat text-chocolate placeholder-cafe/40 text-sm focus:outline-none focus:ring-2 focus:ring-dorado/50 focus:border-dorado transition-all'
 
-const lineaInicial = { productoId: '', cantidad: '1' }
+const lineaInicial = { productoId: '', variacionIdx: '', cantidad: '1' }
 
 const estadoInicial = {
   nombre: '', apellido: '', telefono: '', correo: '',
   calle: '', numero: '', comuna: '', ciudad: '', referencias: '',
   lineas: [{ ...lineaInicial }], fecha: '',
-  metodoPago: '',
+  metodoPago: 'transferencia',
   mensaje: '',
 }
 
@@ -53,19 +52,30 @@ export default function Pedidos() {
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
   const onLineaChange = (i, campo, valor) => {
-    const lineas = form.lineas.map((l, idx) => idx === i ? { ...l, [campo]: valor } : l)
+    const lineas = form.lineas.map((l, idx) => {
+      if (idx !== i) return l
+      const next = { ...l, [campo]: valor }
+      if (campo === 'productoId') next.variacionIdx = ''
+      return next
+    })
     setForm({ ...form, lineas })
   }
   const addLinea = () => setForm({ ...form, lineas: [...form.lineas, { ...lineaInicial }] })
   const removeLinea = (i) => setForm({ ...form, lineas: form.lineas.filter((_, idx) => idx !== i) })
 
-  const lineasConProducto = form.lineas.map((l) => ({
-    ...l,
-    item: String(l.productoId).startsWith('pr-')
+  const lineasConProducto = form.lineas.map((l) => {
+    const item = String(l.productoId).startsWith('pr-')
       ? promociones.find((p) => p.id === Number(String(l.productoId).slice(3)))
-      : productos.find((p) => p.id === Number(l.productoId)),
-  }))
-  const total = lineasConProducto.reduce((sum, l) => sum + (l.item ? l.item.precio * Number(l.cantidad) : 0), 0)
+      : productos.find((p) => p.id === Number(l.productoId))
+    const variac = item?.variaciones?.length > 0 && l.variacionIdx !== ''
+      ? item.variaciones[Number(l.variacionIdx)]
+      : null
+    return { ...l, item, variac }
+  })
+  const total = lineasConProducto.reduce((sum, l) => {
+    const precio = l.variac ? l.variac.precio : (l.item?.precio ?? 0)
+    return sum + precio * Number(l.cantidad)
+  }, 0)
 
   const onSubmit = async (e) => {
     e.preventDefault()
@@ -88,9 +98,9 @@ export default function Pedidos() {
         },
         productos: lineasConProducto.map((l) => ({
           productoId: !String(l.productoId).startsWith('pr-') ? Number(l.productoId) : null,
-          nombre: l.item?.nombre ?? '',
+          nombre: l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? ''),
           cantidad: Number(l.cantidad),
-          precioUnitario: l.item?.precio ?? 0,
+          precioUnitario: l.variac ? l.variac.precio : (l.item?.precio ?? 0),
         })),
         total,
         fechaEntrega: form.fecha,
@@ -106,7 +116,11 @@ export default function Pedidos() {
           `🎂 *Pedido Dulce Emma*`,
           `📋 N° ${resp.numeroPedido}`,
           `👤 ${form.nombre} ${form.apellido} | ${form.telefono}`,
-          ...lineasConProducto.map((l) => `📦 ${l.item?.nombre} x${l.cantidad} — ${formatPrecio((l.item?.precio ?? 0) * Number(l.cantidad))}`),
+          ...lineasConProducto.map((l) => {
+            const nombre = l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? '')
+            const precio = l.variac ? l.variac.precio : (l.item?.precio ?? 0)
+            return `📦 ${nombre} x${l.cantidad} — ${formatPrecio(precio * Number(l.cantidad))}`
+          }),
           `📅 Entrega: ${form.fecha}`,
           `💳 Pago: ${form.metodoPago}`,
           `📍 ${form.calle} ${form.numero}, ${form.comuna}, ${form.ciudad}`,
@@ -230,7 +244,7 @@ export default function Pedidos() {
                           {productos.length > 0 && (
                             <optgroup label="Productos">
                               {productos.map((p) => (
-                                <option key={p.id} value={p.id}>{p.nombre} — {formatPrecio(p.precio)}</option>
+                                <option key={p.id} value={p.id}>{p.nombre}{!p.variaciones?.length ? ` — ${formatPrecio(p.precio)}` : ''}</option>
                               ))}
                             </optgroup>
                           )}
@@ -242,6 +256,19 @@ export default function Pedidos() {
                             </optgroup>
                           )}
                         </select>
+                        {lineasConProducto[i]?.item?.variaciones?.length > 0 && (
+                          <select
+                            value={linea.variacionIdx}
+                            onChange={(e) => onLineaChange(i, 'variacionIdx', e.target.value)}
+                            required
+                            className={`${inputClass} mt-2`}
+                          >
+                            <option value="">Seleccionar tamaño…</option>
+                            {lineasConProducto[i].item.variaciones.map((v, vi) => (
+                              <option key={vi} value={vi}>{v.nombre} — {formatPrecio(v.precio)}</option>
+                            ))}
+                          </select>
+                        )}
                       </div>
                       <div className="flex gap-2">
                         <div className="flex-1">
@@ -277,13 +304,8 @@ export default function Pedidos() {
 
               {/* ── Método de pago ── */}
               <div>
-                <SectionHeader icon={CreditCard} title="Método de pago preferido" />
-                <select name="metodoPago" value={form.metodoPago} onChange={onChange} required className={inputClass}>
-                  <option value="">Seleccionar...</option>
-                  {METODOS_PAGO.map((m) => (
-                    <option key={m.value} value={m.value}>{m.label}</option>
-                  ))}
-                </select>
+                <SectionHeader icon={CreditCard} title="Método de pago" />
+                <p className={`${inputClass} text-crema/70`}>Transferencia bancaria</p>
                 <p className="font-montserrat text-crema/40 text-xs mt-2">
                   Te enviaremos las instrucciones de pago al confirmar el pedido.
                 </p>

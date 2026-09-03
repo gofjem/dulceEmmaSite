@@ -1,6 +1,5 @@
 export const METODOS_PAGO = [
   { value: 'transferencia', label: 'Transferencia bancaria' },
-  { value: 'efectivo', label: 'Efectivo al retirar' },
 ]
 
 export const ESTADOS_PEDIDO = {
