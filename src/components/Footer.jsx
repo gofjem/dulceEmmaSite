@@ -55,17 +55,19 @@ export default function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Instagram"
                 className="w-10 h-10 rounded-full border border-dorado/40 flex items-center justify-center hover:bg-dorado hover:text-chocolate hover:border-dorado transition-all duration-200"
               >
-                <Instagram size={18} />
+                <Instagram size={18} aria-hidden="true" />
               </a>
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Facebook"
                 className="w-10 h-10 rounded-full border border-dorado/40 flex items-center justify-center hover:bg-dorado hover:text-chocolate hover:border-dorado transition-all duration-200"
               >
-                <Facebook size={18} />
+                <Facebook size={18} aria-hidden="true" />
               </a>
             </div>
             <p className="font-montserrat text-crema/50 text-xs">

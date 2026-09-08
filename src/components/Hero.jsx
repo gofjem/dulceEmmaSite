@@ -34,7 +34,7 @@ export default function Hero() {
       <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-dorado to-transparent" />
 
       {/* Content */}
-      <div className={`relative z-10 text-center px-4 max-w-4xl mx-auto transition-all duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
+      <div className={`relative z-10 text-center px-4 max-w-4xl mx-auto transition-[opacity,transform] duration-1000 ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
 
         {/* Logo principal */}
         <div className="flex justify-center mb-6">
@@ -46,7 +46,7 @@ export default function Hero() {
               style={{ filter: 'drop-shadow(0 0 30px rgba(212,181,130,0.3))' }}
             />
             {/* Anillo dorado decorativo */}
-            <div className="absolute -inset-2 rounded-full border border-dorado/30 animate-pulse" />
+            <div className="absolute -inset-2 rounded-full border border-dorado/30 animate-pulse motion-reduce:animate-none" />
           </div>
         </div>
 
@@ -70,9 +70,10 @@ export default function Hero() {
       {/* Scroll indicator */}
       <a
         href="#catalogo"
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-dorado animate-bounce"
+        aria-label="Ir al catálogo"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-dorado animate-bounce motion-reduce:animate-none"
       >
-        <ChevronDown size={32} />
+        <ChevronDown size={32} aria-hidden="true" />
       </a>
     </section>
   )

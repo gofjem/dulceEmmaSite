@@ -23,7 +23,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,padding,box-shadow] duration-500 ${
         scrolled
           ? 'bg-chocolate/95 backdrop-blur-sm shadow-lg py-3'
           : 'bg-transparent py-5'
@@ -63,14 +63,17 @@ export default function Navbar() {
           className="md:hidden text-crema p-1"
           onClick={() => setOpen(!open)}
           aria-label="Menú"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
-          {open ? <X size={24} /> : <Menu size={24} />}
+          {open ? <X size={24} aria-hidden="true" /> : <Menu size={24} aria-hidden="true" />}
         </button>
       </div>
 
       {/* Mobile menu */}
       <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ${
+        id="mobile-menu"
+        className={`md:hidden overflow-hidden transition-[max-height,opacity] duration-300 ${
           open ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
         }`}
       >

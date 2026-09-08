@@ -16,20 +16,20 @@ export default function App() {
 
   // Global scroll reveal
   useEffect(() => {
+    const elements = document.querySelectorAll('.reveal')
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      elements.forEach(el => el.classList.add('visible'))
+      return
+    }
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('visible')
-          }
+          if (entry.isIntersecting) entry.target.classList.add('visible')
         })
       },
       { threshold: 0.1 }
     )
-
-    const elements = document.querySelectorAll('.reveal')
     elements.forEach((el) => observer.observe(el))
-
     return () => observer.disconnect()
   }, [])
 

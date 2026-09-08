@@ -5,7 +5,7 @@ import { crearPedido, getProductos, getPromociones } from '../services/api'
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
 const inputClass =
-  'w-full bg-white border border-dorado/30 rounded-xl px-4 py-3 font-montserrat text-chocolate placeholder-cafe/40 text-sm focus:outline-none focus:ring-2 focus:ring-dorado/50 focus:border-dorado transition-all'
+  'w-full bg-white border border-dorado/30 rounded-xl px-4 py-3 font-montserrat text-chocolate placeholder-cafe/40 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dorado/50 focus-visible:border-dorado transition-[border-color,box-shadow]'
 
 const lineaInicial = { productoId: '', variacionIdx: '', cantidad: '1' }
 
@@ -182,22 +182,22 @@ export default function Pedidos() {
                 <SectionHeader icon={User} title="Datos personales" />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Nombre *</label>
-                    <input type="text" name="nombre" value={form.nombre} onChange={onChange} placeholder="Tu nombre" required className={inputClass} />
+                    <label htmlFor="nombre" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Nombre *</label>
+                    <input id="nombre" type="text" name="nombre" value={form.nombre} onChange={onChange} placeholder="Tu nombre…" required autoComplete="given-name" className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Apellido *</label>
-                    <input type="text" name="apellido" value={form.apellido} onChange={onChange} placeholder="Tu apellido" required className={inputClass} />
+                    <label htmlFor="apellido" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Apellido *</label>
+                    <input id="apellido" type="text" name="apellido" value={form.apellido} onChange={onChange} placeholder="Tu apellido…" required autoComplete="family-name" className={inputClass} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Teléfono *</label>
-                    <input type="tel" name="telefono" value={form.telefono} onChange={onChange} placeholder="+56 9 xxxx xxxx" required className={inputClass} />
+                    <label htmlFor="telefono" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Teléfono *</label>
+                    <input id="telefono" type="tel" name="telefono" value={form.telefono} onChange={onChange} placeholder="+56 9 xxxx xxxx" required autoComplete="tel" spellCheck={false} className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Correo *</label>
-                    <input type="email" name="correo" value={form.correo} onChange={onChange} placeholder="tu@correo.com" required className={inputClass} />
+                    <label htmlFor="correo" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Correo *</label>
+                    <input id="correo" type="email" name="correo" value={form.correo} onChange={onChange} placeholder="tu@correo.com" required autoComplete="email" spellCheck={false} className={inputClass} />
                   </div>
                 </div>
               </div>
@@ -207,27 +207,27 @@ export default function Pedidos() {
                 <SectionHeader icon={MapPin} title="Dirección de entrega" />
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                   <div className="sm:col-span-2">
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Calle *</label>
-                    <input type="text" name="calle" value={form.calle} onChange={onChange} placeholder="Nombre de la calle" required className={inputClass} />
+                    <label htmlFor="calle" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Calle *</label>
+                    <input id="calle" type="text" name="calle" value={form.calle} onChange={onChange} placeholder="Nombre de la calle…" required autoComplete="address-line1" className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Número *</label>
-                    <input type="text" name="numero" value={form.numero} onChange={onChange} placeholder="Ej. 1234" required className={inputClass} />
+                    <label htmlFor="numero" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Número *</label>
+                    <input id="numero" type="text" name="numero" value={form.numero} onChange={onChange} placeholder="Ej. 1234" required autoComplete="address-line2" className={inputClass} />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Comuna *</label>
-                    <input type="text" name="comuna" value={form.comuna} onChange={onChange} placeholder="Tu comuna" required className={inputClass} />
+                    <label htmlFor="comuna" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Comuna *</label>
+                    <input id="comuna" type="text" name="comuna" value={form.comuna} onChange={onChange} placeholder="Tu comuna…" required className={inputClass} />
                   </div>
                   <div>
-                    <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Ciudad *</label>
-                    <input type="text" name="ciudad" value={form.ciudad} onChange={onChange} placeholder="Tu ciudad" required className={inputClass} />
+                    <label htmlFor="ciudad" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Ciudad *</label>
+                    <input id="ciudad" type="text" name="ciudad" value={form.ciudad} onChange={onChange} placeholder="Tu ciudad…" required autoComplete="address-level2" className={inputClass} />
                   </div>
                 </div>
                 <div className="mt-4">
-                  <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Referencias</label>
-                  <input type="text" name="referencias" value={form.referencias} onChange={onChange} placeholder="Ej. depto 3B, portón azul, junto a farmacia..." className={inputClass} />
+                  <label htmlFor="referencias" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Referencias</label>
+                  <input id="referencias" type="text" name="referencias" value={form.referencias} onChange={onChange} placeholder="Ej. depto 3B, portón azul, junto a farmacia…" className={inputClass} />
                 </div>
               </div>
 
@@ -238,9 +238,9 @@ export default function Pedidos() {
                   {form.lineas.map((linea, i) => (
                     <div key={i} className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
                       <div className="sm:col-span-2">
-                        {i === 0 && <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Producto *</label>}
-                        <select value={linea.productoId} onChange={(e) => onLineaChange(i, 'productoId', e.target.value)} required className={inputClass}>
-                          <option value="">Seleccionar...</option>
+                        {i === 0 && <label htmlFor="producto-0" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Producto *</label>}
+                        <select id={`producto-${i}`} aria-label={i > 0 ? `Producto ${i + 1}` : undefined} value={linea.productoId} onChange={(e) => onLineaChange(i, 'productoId', e.target.value)} required className={inputClass}>
+                          <option value="">Seleccionar…</option>
                           {productos.length > 0 && (
                             <optgroup label="Productos">
                               {productos.map((p) => (
@@ -258,6 +258,7 @@ export default function Pedidos() {
                         </select>
                         {lineasConProducto[i]?.item?.variaciones?.length > 0 && (
                           <select
+                            aria-label={`Tamaño del producto ${i + 1}`}
                             value={linea.variacionIdx}
                             onChange={(e) => onLineaChange(i, 'variacionIdx', e.target.value)}
                             required
@@ -272,8 +273,8 @@ export default function Pedidos() {
                       </div>
                       <div className="flex gap-2">
                         <div className="flex-1">
-                          {i === 0 && <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Cantidad *</label>}
-                          <input type="number" value={linea.cantidad} onChange={(e) => onLineaChange(i, 'cantidad', e.target.value)} min="1" max="100" required className={inputClass} />
+                          {i === 0 && <label htmlFor="cantidad-0" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Cantidad *</label>}
+                          <input id={`cantidad-${i}`} aria-label={i > 0 ? `Cantidad del producto ${i + 1}` : undefined} type="number" value={linea.cantidad} onChange={(e) => onLineaChange(i, 'cantidad', e.target.value)} min="1" max="100" required className={inputClass} />
                         </div>
                         {form.lineas.length > 1 && (
                           <button type="button" onClick={() => removeLinea(i)} className="shrink-0 text-rosa/80 hover:text-rosa p-3" aria-label="Quitar producto">
@@ -297,8 +298,8 @@ export default function Pedidos() {
                 )}
 
                 <div className="mt-4">
-                  <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Fecha de entrega *</label>
-                  <input type="date" name="fecha" value={form.fecha} onChange={onChange} required min={minFecha} className={inputClass} />
+                  <label htmlFor="fecha" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Fecha de entrega *</label>
+                  <input id="fecha" type="date" name="fecha" value={form.fecha} onChange={onChange} required min={minFecha} className={inputClass} />
                 </div>
               </div>
 
@@ -313,8 +314,9 @@ export default function Pedidos() {
 
               {/* ── Mensaje especial ── */}
               <div>
-                <label className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Mensaje especial</label>
+                <label htmlFor="mensaje" className="block font-montserrat text-crema/70 text-xs uppercase tracking-wider mb-1.5">Mensaje especial</label>
                 <textarea
+                  id="mensaje"
                   name="mensaje"
                   value={form.mensaje}
                   onChange={onChange}
@@ -325,8 +327,8 @@ export default function Pedidos() {
               </div>
 
               {error && (
-                <div className="flex items-center gap-2 text-rosa font-montserrat text-sm">
-                  <AlertCircle size={16} className="shrink-0" />
+                <div role="alert" className="flex items-center gap-2 text-rosa font-montserrat text-sm">
+                  <AlertCircle size={16} aria-hidden="true" className="shrink-0" />
                   {error}
                 </div>
               )}
@@ -337,7 +339,7 @@ export default function Pedidos() {
                 className="w-full bg-dorado hover:bg-cafe text-chocolate font-montserrat font-semibold py-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl disabled:opacity-70"
               >
                 {loading ? (
-                  <span className="animate-pulse">Enviando...</span>
+                  <span className="animate-pulse">Enviando…</span>
                 ) : (
                   <>
                     <Send size={18} />
