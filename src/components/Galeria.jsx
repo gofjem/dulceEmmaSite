@@ -71,7 +71,7 @@ export default function Galeria() {
         </div>
 
         <p className="text-center mt-8 font-montserrat text-cafe/60 text-sm italic">
-          ♥ Síguenos en Instagram @dulce.emma para más
+          ♥ Síguenos en Instagram @dulceemma.cl para más
         </p>
       </div>
     </section>
