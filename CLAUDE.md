@@ -78,8 +78,10 @@ VITE_ADMIN_PASSWORD=...       # exposed to client via Vite
 - **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has three tabs: **Pedidos** (gestión de estados), **Productos** (CRUD completo), and **Promociones** (CRUD de combos).
 - Desactivar un producto o promoción (`activo=false`) lo oculta del sitio público sin borrarlo de la BD.
 - **Promociones** son combos con precio fijo (ej. "2x Galletas Choco Chips Nutella — $6.500"). Se gestionan desde `/admin` → Promociones. En el formulario de pedido aparecen como `<optgroup label="🎁 Promociones">` dentro del mismo selector. En el payload del pedido se guardan con `productoId: null` en el array `productos` de Supabase. La sección pública `Promociones.jsx` aparece entre Nosotras y Pedidos solo si hay al menos una promo activa. El link "Promociones" está en la navbar (`Navbar.jsx` → `navLinks`) entre Nosotras y Pedidos.
-- Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements.
+- Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements. Respects `prefers-reduced-motion`: if active, all `.reveal` elements get `visible` immediately without observing.
 - Tailwind color names (`chocolate`, `cafe`, `dorado`, `crema`, `rosa`) are custom-defined in `tailwind.config.js`.
+- **Catálogo agrupado por categoría:** `Catalogo.jsx` define `GRUPOS[]` con dos secciones: `"Tortas & Postres"` (cats: Torta, Brownie, Postres Artesanales) y `"Galletas"` (cats: Cookie). Productos con categoría no mapeada caen en un bloque "Otros" automático. Para agregar un nuevo grupo basta editar `GRUPOS[]` en `Catalogo.jsx`. No modificar la columna `categoria` de Supabase para encajar en un grupo — editar `GRUPOS[]` en su lugar.
+- **Instagram handle correcto:** `@dulceemma.cl` (en `Galeria.jsx`). No usar `@dulce.emma`.
 
 ## Imágenes de productos
 
