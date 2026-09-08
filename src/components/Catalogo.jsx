@@ -10,6 +10,11 @@ const DISP_STYLES = {
   'Por encargo': 'bg-amber-100 text-amber-800',
 }
 
+const GRUPOS = [
+  { label: 'Tortas & Postres', cats: ['Torta', 'Brownie', 'Postres Artesanales'] },
+  { label: 'Galletas',         cats: ['Cookie'] },
+]
+
 function ProductCard({ producto, index }) {
   const ref = useRef(null)
   const [selectedVar, setSelectedVar] = useState(0)
@@ -134,12 +139,44 @@ export default function Catalogo() {
           </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {productos.map((p, i) => (
-            <ProductCard key={p.id} producto={p} index={i} />
-          ))}
-        </div>
+        {/* Grupos por categoría */}
+        {GRUPOS.map((grupo) => {
+          const items = productos.filter(p => grupo.cats.includes(p.categoria))
+          if (!items.length) return null
+          return (
+            <div key={grupo.label} className="mb-14 last:mb-0">
+              <div className="flex items-center gap-4 mb-8">
+                <h3 className="font-playfair text-xl md:text-2xl text-chocolate font-semibold shrink-0">
+                  {grupo.label}
+                </h3>
+                <div className="flex-1 h-px bg-dorado/30" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {items.map((p, i) => (
+                  <ProductCard key={p.id} producto={p} index={i} />
+                ))}
+              </div>
+            </div>
+          )
+        })}
+
+        {/* Productos sin categoría reconocida */}
+        {(() => {
+          const todasCats = GRUPOS.flatMap(g => g.cats)
+          const huerfanos = productos.filter(p => !todasCats.includes(p.categoria))
+          if (!huerfanos.length) return null
+          return (
+            <div className="mb-14">
+              <div className="flex items-center gap-4 mb-8">
+                <h3 className="font-playfair text-xl md:text-2xl text-chocolate font-semibold shrink-0">Otros</h3>
+                <div className="flex-1 h-px bg-dorado/30" />
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+                {huerfanos.map((p, i) => <ProductCard key={p.id} producto={p} index={i} />)}
+              </div>
+            </div>
+          )
+        })()}
 
         <div className="text-center mt-12">
           <a href="#pedidos" className="btn-primary">
