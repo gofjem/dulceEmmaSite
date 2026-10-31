@@ -55,7 +55,7 @@ The same `api/` handlers run both locally (via `server.js`) and in production (V
 
 > **Trampa frecuente:** `gofjem` y `jemagofe` son cuentas GitHub distintas. El repo de GitHub es `gofjem/dulceEmmaSite` pero Vercel y Supabase están bajo `jemagofe`. Por eso el deploy usa GitHub Actions en vez de la integración nativa de Vercel.
 
-> **Proyecto Supabase temporal:** Durante la sesión 2026-09-03 se creó accidentalmente el proyecto `lfgmtgelwlwxtkihxjpw` (en otra cuenta). El `.env` local quedó apuntando a ese proyecto vacío. **Para dev local correcto, el `.env` debe usar `jawekeunlviwlhguwkkn` (producción).**
+> **Proyecto Supabase temporal:** Durante la sesión 2026-09-03 se creó accidentalmente el proyecto `lfgmtgelwlwxtkihxjpw` (en otra cuenta, vacío y pausado). El `.env` local apuntó a él hasta 2026-10-31; ya está corregido a `jawekeunlviwlhguwkkn` (producción). Si la API local responde `fetch failed`, revisar que `SUPABASE_URL` no apunte a ese proyecto. No usar `.env.local`: `server.js` solo carga `.env`.
 
 ## Environment variables
 
