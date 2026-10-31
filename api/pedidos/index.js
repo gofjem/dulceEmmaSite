@@ -1,4 +1,5 @@
 import { getSupabase } from '../_lib/supabase.js'
+import { requireAdmin } from '../_lib/auth.js'
 
 function generarNumeroPedido() {
   const now = new Date()
@@ -42,6 +43,7 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'GET') {
+    if (!requireAdmin(req, res)) return
     const { data, error } = await supabase
       .from('pedidos')
       .select('*')

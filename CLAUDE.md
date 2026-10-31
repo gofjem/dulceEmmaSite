@@ -64,7 +64,7 @@ Required in `.env` (local) and Vercel dashboard (production):
 ```
 SUPABASE_URL=https://jawekeunlviwlhguwkkn.supabase.co   # producción — el correcto
 SUPABASE_SERVICE_KEY=eyJ...   # service_role key — server-side only
-VITE_ADMIN_PASSWORD=...       # exposed to client via Vite
+ADMIN_PASSWORD=...            # server-side only — validado en api/_lib/auth.js
 ```
 
 `api/_lib/supabase.js` creates a new client per request (no singleton) using the service_role key — this bypasses Supabase RLS intentionally.
@@ -75,7 +75,7 @@ VITE_ADMIN_PASSWORD=...       # exposed to client via Vite
 - **Variaciones de producto:** columna `variaciones JSONB` en `productos`. Array de `{nombre, precio, imagen?}`. El primer elemento es la opción principal (índice 0). Si un producto tiene variaciones, `Catalogo.jsx` muestra pill buttons y usa el precio/imagen de la variación activa. `Pedidos.jsx` muestra un sub-selector de tamaño. `Admin.jsx` edita el JSON directo en un textarea. Actualmente solo el Quesillo Premium tiene variaciones. Agregado 2026-09-03.
 - **Pedidos** are stored in Supabase. `cancelarPedido` does a `PUT estado='Cancelado'`, never a hard delete.
 - El formulario público de `Pedidos.jsx` soporta múltiples líneas de producto por pedido (array `form.lineas`, botones "Agregar otro producto" / quitar). El payload enviado sigue siendo `productos: [...]`, formato que el backend (`api/pedidos/index.js`) y el panel admin ya soportaban desde antes. Agregado 2026-08-14.
-- **Admin panel** lives at `/admin`. Auth is a plain password check against `import.meta.env.VITE_ADMIN_PASSWORD`. Has three tabs: **Pedidos** (gestión de estados), **Productos** (CRUD completo), and **Promociones** (CRUD de combos).
+- **Admin panel** lives at `/admin`. Auth: el admin envía la contraseña en el header `x-admin-password` y el servidor la compara con `ADMIN_PASSWORD` (`requireAdmin` en `api/_lib/auth.js`). Rutas públicas sin auth: `GET /api/productos`, `GET /api/promociones` y `POST /api/pedidos`; todo lo demás (incluido `?all=true`) devuelve 401 sin la contraseña. Los `PUT`/`POST` solo aceptan columnas de una whitelist (`pick`). No usar `VITE_` para secretos: se incrustan en el bundle público. Has three tabs: **Pedidos** (gestión de estados), **Productos** (CRUD completo), and **Promociones** (CRUD de combos).
 - Desactivar un producto o promoción (`activo=false`) lo oculta del sitio público sin borrarlo de la BD.
 - **Promociones** son combos con precio fijo (ej. "2x Galletas Choco Chips Nutella — $6.500"). Se gestionan desde `/admin` → Promociones. En el formulario de pedido aparecen como `<optgroup label="🎁 Promociones">` dentro del mismo selector. En el payload del pedido se guardan con `productoId: null` en el array `productos` de Supabase. La sección pública `Promociones.jsx` aparece entre Nosotras y Pedidos solo si hay al menos una promo activa. El link "Promociones" está en la navbar (`Navbar.jsx` → `navLinks`) entre Nosotras y Pedidos.
 - Scroll reveal animations use a single `IntersectionObserver` in `App.jsx` watching `.reveal` class elements. Respects `prefers-reduced-motion`: if active, all `.reveal` elements get `visible` immediately without observing.

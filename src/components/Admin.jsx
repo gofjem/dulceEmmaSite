@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
-import { getPedidos, actualizarPedido, cancelarPedido, getProductos, crearProducto, actualizarProducto, getPromociones, crearPromocion, actualizarPromocion } from '../services/api'
+import { setAdminPassword, getPedidos, actualizarPedido, cancelarPedido, getProductos, crearProducto, actualizarProducto, getPromociones, crearPromocion, actualizarPromocion } from '../services/api'
 
-// ponytail: contraseña en var de entorno del cliente; suficiente para panel interno
-const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASSWORD ?? 'dulceemma2024'
 
 const ESTADOS = ['Pendiente', 'En Preparación', 'Listo', 'Entregado', 'Cancelado']
 
@@ -31,10 +29,12 @@ function Login({ onLogin }) {
   const [pass, setPass] = useState('')
   const [error, setError] = useState(false)
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault()
-    if (pass === ADMIN_PASS) onLogin()
-    else setError(true)
+    // El servidor valida la contraseña: si puede leer pedidos, es correcta
+    setAdminPassword(pass)
+    try { await getPedidos(); onLogin() }
+    catch { setAdminPassword(''); setError(true) }
   }
 
   return (

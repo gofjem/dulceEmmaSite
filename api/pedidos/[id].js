@@ -1,6 +1,8 @@
 import { getSupabase } from '../_lib/supabase.js'
+import { requireAdmin } from '../_lib/auth.js'
 
 export default async function handler(req, res) {
+  if (!requireAdmin(req, res)) return
   const { id } = req.query
   const supabase = getSupabase()
 
@@ -16,9 +18,10 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PUT') {
+    // Desde el admin solo se cambia el estado
     const { data, error } = await supabase
       .from('pedidos')
-      .update(req.body)
+      .update({ estado: req.body?.estado })
       .eq('id', id)
       .select()
       .single()
