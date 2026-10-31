@@ -49,7 +49,7 @@ The same `api/` handlers run both locally (via `server.js`) and in production (V
 |---|---|---|
 | **GitHub (repo)** | `gofjem` | Repo `gofjem/dulceEmmaSite` — autenticado en git local |
 | **GitHub (Vercel/Supabase)** | `jemagofe` | Cuenta separada — usada para login en Vercel y Supabase vía GitHub OAuth |
-| **Vercel** | `jemagofe` / team `websitedev1` | Email: `cacay.gestion@gmail.com` · Proyecto: `dulce-emma` |
+| **Vercel** | `jemagofe` / team `websitedev1` | Email: `jesusmgonzferz@gmail.com` · Proyecto: `dulce-emma` |
 | **Supabase (producción)** | cuenta `jemagofe` (GitHub OAuth) | Project ID: `jawekeunlviwlhguwkkn` · URL: `https://jawekeunlviwlhguwkkn.supabase.co` |
 | **Cloudflare / Hostinger** | andreinamquintero@gmail.com | DNS y dominio dulceemma.cl |
 
