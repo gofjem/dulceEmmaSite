@@ -2,6 +2,31 @@ export const METODOS_PAGO = [
   { value: 'transferencia', label: 'Transferencia bancaria' },
 ]
 
+// ponytail: clasificación por precio — ≤3500 clásica, >3500 premium
+export const COMBOS_GALLETAS = [
+  {
+    id: 'combo-clasicas',
+    nombre: '2 Galletas Clásicas',
+    precio: 6500,
+    slots: ['clasica', 'clasica'],
+    descripcion: 'Elige 2 sabores de nuestras galletas clásicas.',
+  },
+  {
+    id: 'combo-premium',
+    nombre: '2 Galletas Premium',
+    precio: 7500,
+    slots: ['premium', 'premium'],
+    descripcion: 'Elige 2 sabores de nuestras galletas premium.',
+  },
+  {
+    id: 'combo-mix',
+    nombre: 'Mix: 1 Clásica + 1 Premium',
+    precio: 7000,
+    slots: ['clasica', 'premium'],
+    descripcion: '1 galleta clásica y 1 galleta premium a tu elección.',
+  },
+]
+
 export const ESTADOS_PEDIDO = {
   PENDIENTE: 'Pendiente',
   PAGADO: 'Pagado',

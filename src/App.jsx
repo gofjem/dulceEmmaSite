@@ -39,9 +39,9 @@ export default function App() {
       <main>
         <Hero />
         <Catalogo />
+        <Promociones />
         <Galeria />
         <Nosotras />
-        <Promociones />
         <Pedidos />
         <Contacto />
       </main>

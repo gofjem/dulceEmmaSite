@@ -22,7 +22,7 @@ const DISP_COLORS = {
 
 const FORM_VACIO = {
   nombre: '', descripcion: '', precio: '', stock: '0',
-  imagen: '', tag: '', categoria: '', disponibilidad: 'Disponible', variaciones: '',
+  imagen: '', tag: '', categoria: '', disponibilidad: 'Disponible', variaciones: '', tipo_galleta: '',
 }
 
 function Login({ onLogin }) {
@@ -167,6 +167,16 @@ function ProductosPanel() {
             <label className="block text-xs text-gray-500 mb-1">Tag</label>
             <input name="tag" value={form.tag} onChange={onChange} placeholder="Favorito, Especial, Premium…" className={input} />
           </div>
+          {form.categoria === 'Cookie' && (
+            <div>
+              <label className="block text-xs text-gray-500 mb-1">Tipo de galleta (para combos)</label>
+              <select name="tipo_galleta" value={form.tipo_galleta ?? ''} onChange={onChange} className={input}>
+                <option value="">Sin clasificar</option>
+                <option value="clasica">Clásica</option>
+                <option value="premium">Premium</option>
+              </select>
+            </div>
+          )}
           <div>
             <label className="block text-xs text-gray-500 mb-1">Disponibilidad</label>
             <select name="disponibilidad" value={form.disponibilidad ?? 'Disponible'} onChange={onChange} className={input}>
@@ -223,7 +233,12 @@ function ProductosPanel() {
                 <tr key={p.id} className={i % 2 === 0 ? 'bg-white' : 'bg-amber-50'}>
                   <td className="px-4 py-3 font-medium">{p.nombre}</td>
                   <td className="px-4 py-3 whitespace-nowrap">${p.precio?.toLocaleString('es-CL')}</td>
-                  <td className="px-4 py-3 text-gray-600">{p.categoria}</td>
+                  <td className="px-4 py-3 text-gray-600">
+                    {p.categoria}
+                    {p.tipo_galleta && (
+                      <span className="ml-1.5 text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded-full">{p.tipo_galleta}</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3 text-gray-600">{p.tag}</td>
                   <td className="px-4 py-3">
                     <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${DISP_COLORS[p.disponibilidad] ?? DISP_COLORS['Disponible']}`}>

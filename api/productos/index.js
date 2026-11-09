@@ -1,7 +1,7 @@
 import { getSupabase } from '../_lib/supabase.js'
 import { requireAdmin, pick } from '../_lib/auth.js'
 
-export const CAMPOS_PRODUCTO = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'tag', 'categoria', 'disponibilidad', 'variaciones', 'activo']
+export const CAMPOS_PRODUCTO = ['nombre', 'descripcion', 'precio', 'stock', 'imagen', 'tag', 'categoria', 'disponibilidad', 'variaciones', 'activo', 'tipo_galleta']
 
 export default async function handler(req, res) {
   const supabase = getSupabase()

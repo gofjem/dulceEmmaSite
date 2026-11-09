@@ -1,13 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { Send, CheckCircle, User, MapPin, ShoppingBag, CreditCard, AlertCircle, Plus, Trash2 } from 'lucide-react'
 import { crearPedido, getProductos, getPromociones } from '../services/api'
+import { COMBOS_GALLETAS } from '../data/productos'
 
 const formatPrecio = (n) => `$${n.toLocaleString('es-CL')}`
 
 const inputClass =
   'w-full bg-white border border-dorado/30 rounded-xl px-4 py-3 font-montserrat text-chocolate placeholder-cafe/40 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-dorado/50 focus-visible:border-dorado transition-[border-color,box-shadow]'
 
-const lineaInicial = { productoId: '', variacionIdx: '', cantidad: '1' }
+const lineaInicial = { productoId: '', variacionIdx: '', cantidad: '1', sabores: [] }
 
 const estadoInicial = {
   nombre: '', apellido: '', telefono: '', correo: '',
@@ -24,6 +25,29 @@ function SectionHeader({ icon: Icon, title }) {
       <span className="font-montserrat text-crema/70 text-xs uppercase tracking-widest font-semibold">{title}</span>
     </div>
   )
+}
+
+function ComboSabores({ linea, lineaIdx, productos, onChange }) {
+  const combo = COMBOS_GALLETAS.find((c) => c.id === linea.productoId)
+  if (!combo) return null
+  return combo.slots.map((tipo, si) => {
+    const opciones = productos.filter((p) => p.categoria === 'Cookie' && p.tipo_galleta === tipo)
+    return (
+      <select
+        key={si}
+        aria-label={`Sabor ${si + 1} del combo`}
+        value={linea.sabores?.[si] ?? ''}
+        onChange={(e) => onChange(lineaIdx, si, e.target.value)}
+        required
+        className={`${inputClass} mt-2`}
+      >
+        <option value="">Sabor {si + 1} ({tipo === 'clasica' ? 'clásica' : 'premium'})…</option>
+        {opciones.map((p) => (
+          <option key={p.id} value={p.id}>{p.nombre.replace('Galletas New York ', '')}</option>
+        ))}
+      </select>
+    )
+  })
 }
 
 export default function Pedidos() {
@@ -55,18 +79,30 @@ export default function Pedidos() {
     const lineas = form.lineas.map((l, idx) => {
       if (idx !== i) return l
       const next = { ...l, [campo]: valor }
-      if (campo === 'productoId') next.variacionIdx = ''
+      if (campo === 'productoId') { next.variacionIdx = ''; next.sabores = [] }
       return next
     })
     setForm({ ...form, lineas })
   }
   const addLinea = () => setForm({ ...form, lineas: [...form.lineas, { ...lineaInicial }] })
   const removeLinea = (i) => setForm({ ...form, lineas: form.lineas.filter((_, idx) => idx !== i) })
+  const onSaborChange = (lineaIdx, si, valor) => {
+    const lineas = form.lineas.map((l, i) => {
+      if (i !== lineaIdx) return l
+      const sabores = [...(l.sabores ?? [])]
+      sabores[si] = valor
+      return { ...l, sabores }
+    })
+    setForm({ ...form, lineas })
+  }
 
   const lineasConProducto = form.lineas.map((l) => {
-    const item = String(l.productoId).startsWith('pr-')
-      ? promociones.find((p) => p.id === Number(String(l.productoId).slice(3)))
-      : productos.find((p) => p.id === Number(l.productoId))
+    const pid = String(l.productoId)
+    const item = pid.startsWith('combo-')
+      ? COMBOS_GALLETAS.find((c) => c.id === pid)
+      : pid.startsWith('pr-')
+        ? promociones.find((p) => p.id === Number(pid.slice(3)))
+        : productos.find((p) => p.id === Number(pid))
     const variac = item?.variaciones?.length > 0 && l.variacionIdx !== ''
       ? item.variaciones[Number(l.variacionIdx)]
       : null
@@ -96,12 +132,21 @@ export default function Pedidos() {
           ciudad: form.ciudad,
           referencias: form.referencias,
         },
-        productos: lineasConProducto.map((l) => ({
-          productoId: !String(l.productoId).startsWith('pr-') ? Number(l.productoId) : null,
-          nombre: l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? ''),
-          cantidad: Number(l.cantidad),
-          precioUnitario: l.variac ? l.variac.precio : (l.item?.precio ?? 0),
-        })),
+        productos: lineasConProducto.map((l) => {
+          if (String(l.productoId).startsWith('combo-')) {
+            const sabores = (l.sabores ?? []).map((sid) => {
+              const p = productos.find((prod) => prod.id === Number(sid))
+              return p ? p.nombre.replace('Galletas New York ', '') : '?'
+            }).join(' + ')
+            return { productoId: null, nombre: `${l.item?.nombre ?? ''} — ${sabores}`, cantidad: Number(l.cantidad), precioUnitario: l.item?.precio ?? 0 }
+          }
+          return {
+            productoId: !String(l.productoId).startsWith('pr-') ? Number(l.productoId) : null,
+            nombre: l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? ''),
+            cantidad: Number(l.cantidad),
+            precioUnitario: l.variac ? l.variac.precio : (l.item?.precio ?? 0),
+          }
+        }),
         total,
         fechaEntrega: form.fecha,
         metodoPago: form.metodoPago,
@@ -117,8 +162,18 @@ export default function Pedidos() {
           `📋 N° ${resp.numeroPedido}`,
           `👤 ${form.nombre} ${form.apellido} | ${form.telefono}`,
           ...lineasConProducto.map((l) => {
-            const nombre = l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? '')
-            const precio = l.variac ? l.variac.precio : (l.item?.precio ?? 0)
+            let nombre, precio
+            if (String(l.productoId).startsWith('combo-')) {
+              const sabores = (l.sabores ?? []).map((sid) => {
+                const p = productos.find((prod) => prod.id === Number(sid))
+                return p ? p.nombre.replace('Galletas New York ', '') : '?'
+              }).join(' + ')
+              nombre = `${l.item?.nombre ?? ''} (${sabores})`
+              precio = l.item?.precio ?? 0
+            } else {
+              nombre = l.variac ? `${l.item?.nombre ?? ''} — ${l.variac.nombre}` : (l.item?.nombre ?? '')
+              precio = l.variac ? l.variac.precio : (l.item?.precio ?? 0)
+            }
             return `📦 ${nombre} x${l.cantidad} — ${formatPrecio(precio * Number(l.cantidad))}`
           }),
           `📅 Entrega: ${form.fecha}`,
@@ -248,8 +303,13 @@ export default function Pedidos() {
                               ))}
                             </optgroup>
                           )}
+                          <optgroup label="🎁 Combos de Galletas">
+                            {COMBOS_GALLETAS.map((c) => (
+                              <option key={c.id} value={c.id}>{c.nombre} — {formatPrecio(c.precio)}</option>
+                            ))}
+                          </optgroup>
                           {promociones.length > 0 && (
-                            <optgroup label="🎁 Promociones">
+                            <optgroup label="🎁 Otras promociones">
                               {promociones.map((p) => (
                                 <option key={`pr-${p.id}`} value={`pr-${p.id}`}>{p.nombre} — {formatPrecio(p.precio)}</option>
                               ))}
@@ -269,6 +329,9 @@ export default function Pedidos() {
                               <option key={vi} value={vi}>{v.nombre} — {formatPrecio(v.precio)}</option>
                             ))}
                           </select>
+                        )}
+                        {String(linea.productoId).startsWith('combo-') && (
+                          <ComboSabores linea={linea} lineaIdx={i} productos={productos} onChange={onSaborChange} />
                         )}
                       </div>
                       <div className="flex gap-2">

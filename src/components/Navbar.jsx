@@ -4,9 +4,9 @@ import { Menu, X } from 'lucide-react'
 const navLinks = [
   { label: 'Inicio', href: '#inicio' },
   { label: 'Catálogo', href: '#catalogo' },
+  { label: 'Promociones', href: '#promociones' },
   { label: 'Galería', href: '#galeria' },
   { label: 'Nosotras', href: '#nosotras' },
-  { label: 'Promociones', href: '#promociones' },
   { label: 'Pedidos', href: '#pedidos' },
   { label: 'Contacto', href: '#contacto' },
 ]
