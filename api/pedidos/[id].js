@@ -18,10 +18,12 @@ export default async function handler(req, res) {
   }
 
   if (req.method === 'PUT') {
-    // Desde el admin solo se cambia el estado
+    const allowed = ['estado', 'cliente_nombre', 'cliente_apellido', 'cliente_telefono', 'cliente_correo',
+      'direccion_calle', 'direccion_numero', 'direccion_comuna', 'direccion_ciudad', 'direccion_referencias', 'mensaje']
+    const updates = Object.fromEntries(Object.entries(req.body ?? {}).filter(([k]) => allowed.includes(k)))
     const { data, error } = await supabase
       .from('pedidos')
-      .update({ estado: req.body?.estado })
+      .update(updates)
       .eq('id', id)
       .select()
       .single()

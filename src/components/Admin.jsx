@@ -273,11 +273,29 @@ function ProductosPanel() {
 
 // ── PEDIDOS ──────────────────────────────────────────────────────────────────
 
+function pedidoAForm(p) {
+  return {
+    cliente_nombre: p.cliente_nombre ?? '',
+    cliente_apellido: p.cliente_apellido ?? '',
+    cliente_telefono: p.cliente_telefono ?? '',
+    cliente_correo: p.cliente_correo ?? '',
+    direccion_calle: p.direccion_calle ?? '',
+    direccion_numero: p.direccion_numero ?? '',
+    direccion_comuna: p.direccion_comuna ?? '',
+    direccion_ciudad: p.direccion_ciudad ?? '',
+    direccion_referencias: p.direccion_referencias ?? '',
+    mensaje: p.mensaje ?? '',
+  }
+}
+
 function PedidosPanel() {
   const [pedidos, setPedidos] = useState([])
   const [filtro, setFiltro] = useState('Todos')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [editando, setEditando] = useState(null)
+  const [editForm, setEditForm] = useState({})
+  const [guardando, setGuardando] = useState(false)
 
   async function cargar() {
     setLoading(true)
@@ -298,7 +316,26 @@ function PedidosPanel() {
     setPedidos(prev => prev.map(p => p.id === id ? { ...p, estado } : p))
   }
 
+  function abrirEdicion(p) {
+    setEditando(p.id)
+    setEditForm(pedidoAForm(p))
+  }
+
+  async function guardarEdicion(id) {
+    setGuardando(true)
+    try {
+      const actualizado = await actualizarPedido(id, editForm)
+      setPedidos(prev => prev.map(p => p.id === id ? { ...p, ...actualizado } : p))
+      setEditando(null)
+    } catch (e) {
+      alert('Error al guardar: ' + e.message)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
   const filtrados = filtro === 'Todos' ? pedidos : pedidos.filter(p => p.estado === filtro)
+  const inp = 'border border-gray-200 rounded px-2 py-1 text-sm w-full'
 
   return (
     <div>
@@ -334,46 +371,104 @@ function PedidosPanel() {
           <table className="w-full text-sm">
             <thead style={{ background: '#2D1C15', color: '#F7F1E8' }}>
               <tr>
-                {['Nº Pedido', 'Cliente', 'Productos', 'Total', 'Entrega', 'Estado'].map(h => (
+                {['Nº Pedido', 'Cliente', 'Productos', 'Total', 'Entrega', 'Estado', ''].map(h => (
                   <th key={h} className="px-4 py-3 text-left font-medium">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {filtrados.length === 0 && (
-                <tr><td colSpan={6} className="text-center text-gray-400 py-8">Sin pedidos</td></tr>
+                <tr><td colSpan={7} className="text-center text-gray-400 py-8">Sin pedidos</td></tr>
               )}
               {filtrados.map((p, i) => (
-                <tr key={p.id} className={i % 2 === 0 ? 'bg-white' : 'bg-amber-50'}>
-                  <td className="px-4 py-3 font-mono text-xs font-semibold" style={{ color: '#8B5E3C' }}>
-                    {p.numero_pedido}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{p.cliente_nombre} {p.cliente_apellido}</div>
-                    <div className="text-gray-400 text-xs">{p.cliente_telefono}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {Array.isArray(p.productos)
-                      ? p.productos.map(pr => (
-                          <div key={pr.id} className="text-xs">{pr.nombre} ×{pr.cantidad}</div>
-                        ))
-                      : <span className="text-gray-400">—</span>
-                    }
-                  </td>
-                  <td className="px-4 py-3 font-semibold">${p.total?.toLocaleString('es-CL')}</td>
-                  <td className="px-4 py-3 text-xs text-gray-600">
-                    {p.fecha_entrega ? new Date(p.fecha_entrega + 'T12:00:00').toLocaleDateString('es-CL') : '—'}
-                  </td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={p.estado}
-                      onChange={e => cambiarEstado(p.id, e.target.value)}
-                      className={`text-xs font-medium px-2 py-1 rounded-full border-0 cursor-pointer ${ESTADO_COLORS[p.estado]}`}
-                    >
-                      {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
-                    </select>
-                  </td>
-                </tr>
+                <>
+                  <tr key={p.id} className={i % 2 === 0 ? 'bg-white' : 'bg-amber-50'}>
+                    <td className="px-4 py-3 font-mono text-xs font-semibold" style={{ color: '#8B5E3C' }}>
+                      {p.numero_pedido}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{p.cliente_nombre} {p.cliente_apellido}</div>
+                      <div className="text-gray-400 text-xs">{p.cliente_telefono}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {Array.isArray(p.productos)
+                        ? p.productos.map(pr => (
+                            <div key={pr.id} className="text-xs">{pr.nombre} ×{pr.cantidad}</div>
+                          ))
+                        : <span className="text-gray-400">—</span>
+                      }
+                    </td>
+                    <td className="px-4 py-3 font-semibold">${p.total?.toLocaleString('es-CL')}</td>
+                    <td className="px-4 py-3 text-xs text-gray-600">
+                      {p.fecha_entrega ? new Date(p.fecha_entrega + 'T12:00:00').toLocaleDateString('es-CL') : '—'}
+                    </td>
+                    <td className="px-4 py-3">
+                      <select
+                        value={p.estado}
+                        onChange={e => cambiarEstado(p.id, e.target.value)}
+                        className={`text-xs font-medium px-2 py-1 rounded-full border-0 cursor-pointer ${ESTADO_COLORS[p.estado]}`}
+                      >
+                        {ESTADOS.map(e => <option key={e} value={e}>{e}</option>)}
+                      </select>
+                    </td>
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => editando === p.id ? setEditando(null) : abrirEdicion(p)}
+                        className="text-xs px-2 py-1 rounded border transition-colors"
+                        style={editando === p.id
+                          ? { background: '#F7F1E8', borderColor: '#8B5E3C', color: '#8B5E3C' }
+                          : { borderColor: '#d1d5db', color: '#6b7280' }}
+                      >
+                        {editando === p.id ? 'Cerrar' : 'Editar'}
+                      </button>
+                    </td>
+                  </tr>
+                  {editando === p.id && (
+                    <tr key={`edit-${p.id}`} className="bg-amber-50 border-t border-amber-200">
+                      <td colSpan={7} className="px-6 py-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                          {[
+                            ['Nombre', 'cliente_nombre'],
+                            ['Apellido', 'cliente_apellido'],
+                            ['Teléfono', 'cliente_telefono'],
+                            ['Correo', 'cliente_correo'],
+                            ['Calle', 'direccion_calle'],
+                            ['Número', 'direccion_numero'],
+                            ['Comuna', 'direccion_comuna'],
+                            ['Ciudad', 'direccion_ciudad'],
+                            ['Referencias', 'direccion_referencias'],
+                            ['Mensaje', 'mensaje'],
+                          ].map(([label, key]) => (
+                            <div key={key}>
+                              <label className="block text-xs text-gray-500 mb-1">{label}</label>
+                              <input
+                                value={editForm[key]}
+                                onChange={e => setEditForm({ ...editForm, [key]: e.target.value })}
+                                className={inp}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => guardarEdicion(p.id)}
+                            disabled={guardando}
+                            className="px-4 py-1.5 rounded text-sm text-white disabled:opacity-50"
+                            style={{ background: '#8B5E3C' }}
+                          >
+                            {guardando ? 'Guardando…' : 'Guardar cambios'}
+                          </button>
+                          <button
+                            onClick={() => setEditando(null)}
+                            className="px-4 py-1.5 rounded text-sm border border-gray-300 text-gray-600"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </>
               ))}
             </tbody>
           </table>
