@@ -253,7 +253,7 @@ function ProductosPanel() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
-                      <button onClick={() => setForm({ ...p, precio: String(p.precio), stock: String(p.stock), variaciones: p.variaciones ? JSON.stringify(p.variaciones, null, 2) : '' })} className={btn('cafe')}>
+                      <button onClick={() => { setForm({ ...p, precio: String(p.precio), stock: String(p.stock), variaciones: p.variaciones ? JSON.stringify(p.variaciones, null, 2) : '' }); window.scrollTo({ top: 0, behavior: 'smooth' }) }} className={btn('cafe')}>
                         Editar
                       </button>
                       <button onClick={() => toggleActivo(p)} className={btn(p.activo ? 'red' : 'green')}>
@@ -608,7 +608,7 @@ function PromocionesPanel() {
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <button
-                        onClick={() => setForm({ ...p, precio: String(p.precio) })}
+                        onClick={() => { setForm({ ...p, precio: String(p.precio) }); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
                         className="px-3 py-1 rounded-lg text-xs text-white font-medium bg-amber-700 hover:bg-amber-800"
                       >
                         Editar
