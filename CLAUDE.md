@@ -85,13 +85,16 @@ ADMIN_PASSWORD=...            # server-side only — validado en api/_lib/auth.j
 
 ## Imágenes de productos
 
-Las imágenes locales van en `public/images/` y se referencian como `/images/nombre.png`. Vite las sirve estáticamente desde `public/`.
+Las imágenes locales van en `public/images/` y se referencian como `/images/nombre.ext`. Vite las sirve estáticamente desde `public/`.
+
+El sitio usa WebP en producción. `Catalogo.jsx` renderiza un elemento `<picture>` que deriva la ruta WebP reemplazando la extensión (`.png`/`.jpg` → `.webp`). `Nosotras.jsx`, `Hero.jsx` y `Footer.jsx` apuntan directamente al `.webp`. El script `scripts/convert-webp.js` hace la conversión con `sharp` a calidad 82.
 
 **Flujo para agregar una imagen nueva:**
 1. El usuario pone el archivo en `images/` (raíz del proyecto, carpeta no commiteada).
 2. Copiar a `public/images/` con el nombre exacto.
-3. Hacer commit de `public/images/archivo.png`.
-4. Entrar al panel admin → Productos → Editar el producto y escribir la ruta `/images/nombre.png` en el campo Imagen.
+3. Correr `node scripts/convert-webp.js` — genera el `.webp` al lado del original.
+4. Hacer commit de ambos archivos: `public/images/archivo.png` y `public/images/archivo.webp`.
+5. Entrar al panel admin → Productos → Editar el producto y escribir la ruta `/images/nombre.png` en el campo Imagen (el `.webp` se sirve automáticamente en el catálogo).
 
 **Estado actual — todas las imágenes son locales:**
 
@@ -107,6 +110,9 @@ Las imágenes locales van en `public/images/` y se referencian como `/images/nom
 | Galletas Pie de Limón | `public/images/Galle_PieLimon.png` | |
 | Quesillo Premium — Porción 19 cm | `public/images/Quesillo_19cm.png` | imagen de variación (por defecto) |
 | Quesillo Premium — Porción individual | `public/images/Quesillo_Art.png` | imagen de variación alternativa |
+| Galleta NY Choco Chips Nutella | `public/images/choco_chips_nutella.png` | |
+| Galleta NY Pistacho Flow | `public/images/Galle_pistacho.png` | |
+| Galleta NY Lotus | `public/images/Galle_lotus.png` | |
 | Sección Nosotras | `public/images/Nosotras.jpeg` | |
 
 ## Imágenes de promociones
@@ -116,8 +122,9 @@ El flujo es idéntico al de productos. Las imágenes van en `public/images/` y s
 **Flujo para agregar imagen a una promo:**
 1. El usuario pone el archivo en `images/` (raíz del proyecto, carpeta no commiteada).
 2. Copiar a `public/images/` con el nombre exacto.
-3. Hacer commit de `public/images/archivo.png`.
-4. Entrar al panel admin → Promociones → Editar la promo y escribir la ruta `/images/nombre.png` en el campo Imagen.
+3. Correr `node scripts/convert-webp.js` — genera el `.webp` al lado del original.
+4. Hacer commit de ambos archivos: `public/images/archivo.png` y `public/images/archivo.webp`.
+5. Entrar al panel admin → Promociones → Editar la promo y escribir la ruta `/images/nombre.png` en el campo Imagen.
 
 Si no se asigna imagen, la card muestra un ícono placeholder (Tag de lucide-react).
 
@@ -142,6 +149,9 @@ Si no se asigna imagen, la card muestra un ícono placeholder (Tag de lucide-rea
 | 7 | Galletas New York Choco Chips Nuez | $3.500 | Cookie | Especial |
 | 8 | Galletas New York Pie de Limón | $3.700 | Cookie | Especial |
 | 9 | Quesillo Premium de Caramelo | ver variaciones | Postres Artesanales | Especial |
+| 10 | Galleta NY Choco Chips Nutella | $3.700 | Cookie | Premium |
+| 11 | Galleta NY Pistacho Flow | $3.900 | Cookie | Premium |
+| 12 | Galleta NY Lotus | $3.700 | Cookie | Especial |
 
 **Variaciones del Quesillo (columna `variaciones` en Supabase):**
 ```json
