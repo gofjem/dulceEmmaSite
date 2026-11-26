@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
-import Admin from './components/Admin'
+import { useEffect, lazy, Suspense } from 'react'
+const Admin = lazy(() => import('./components/Admin'))
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Catalogo from './components/Catalogo'
@@ -12,7 +12,7 @@ import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
 
 export default function App() {
-  if (window.location.pathname === '/admin') return <Admin />
+  if (window.location.pathname === '/admin') return <Suspense fallback={null}><Admin /></Suspense>
 
   // Global scroll reveal
   useEffect(() => {
