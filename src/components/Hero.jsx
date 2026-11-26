@@ -40,7 +40,7 @@ export default function Hero() {
         <div className="flex justify-center mb-6">
           <div className="relative">
             <img
-              src="/logo.png"
+              src="/logo.webp"
               alt="Dulce Emma"
               className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 rounded-full object-cover shadow-2xl border-4 border-dorado/50"
               style={{ filter: 'drop-shadow(0 0 30px rgba(212,181,130,0.3))' }}

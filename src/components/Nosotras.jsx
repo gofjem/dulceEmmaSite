@@ -42,7 +42,7 @@ export default function Nosotras() {
           <div ref={leftRef} className="reveal relative">
             <div className="relative rounded-3xl overflow-hidden shadow-2xl aspect-[4/5] max-w-md mx-auto">
               <img
-                src="/images/Nosotras.jpeg"
+                src="/images/Nosotras.webp"
                 alt="Emma en su cocina"
                 className="w-full h-full object-cover"
               />

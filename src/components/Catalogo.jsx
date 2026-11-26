@@ -36,18 +36,22 @@ function ProductCard({ producto, index }) {
 
   const vars = producto.variaciones
   const activeImg = vars?.length > 0 && vars[selectedVar]?.imagen ? vars[selectedVar].imagen : producto.imagen
+  const activeImgWebP = activeImg?.replace(/\.(png|jpe?g)$/i, '.webp')
   const activePrecio = vars?.length > 0 ? vars[selectedVar].precio : producto.precio
 
   return (
     <div ref={ref} className="reveal card-hover bg-white rounded-2xl overflow-hidden shadow-md group">
       {/* Image */}
       <div className="relative overflow-hidden h-52">
-        <img
-          src={activeImg}
-          alt={producto.nombre}
-          loading="lazy"
-          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        />
+        <picture>
+          <source srcSet={activeImgWebP} type="image/webp" />
+          <img
+            src={activeImg}
+            alt={producto.nombre}
+            loading="lazy"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+          />
+        </picture>
         <div className="absolute inset-0 bg-gradient-to-t from-chocolate/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <span className="absolute top-3 left-3 bg-dorado text-chocolate text-xs font-montserrat font-semibold px-3 py-1 rounded-full">
           {producto.tag}
